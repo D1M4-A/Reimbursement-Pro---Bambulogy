@@ -40,8 +40,17 @@ create table if not exists public.reimbursement_claims (
   paid_at date,
   payment_method text,
   receipt jsonb,
-  payment_proof jsonb
+  payment_proof jsonb,
+  odoo_bill_id bigint,
+  odoo_bill_name text,
+  odoo_synced_at timestamptz,
+  odoo_sync_error text
 );
+
+alter table public.reimbursement_claims add column if not exists odoo_bill_id bigint;
+alter table public.reimbursement_claims add column if not exists odoo_bill_name text;
+alter table public.reimbursement_claims add column if not exists odoo_synced_at timestamptz;
+alter table public.reimbursement_claims add column if not exists odoo_sync_error text;
 
 create index if not exists idx_reimbursement_claims_status on public.reimbursement_claims(status);
 create index if not exists idx_reimbursement_claims_unit on public.reimbursement_claims(unit);
