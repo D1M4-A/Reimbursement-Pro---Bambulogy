@@ -1,0 +1,9 @@
+{
+  "name": "Reimburse Pro Bambulogy",
+  "short_name": "Reimburse Pro",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0866df",
+  "description": "Flutter Web host for Reimburse Pro Bambulogy"
+}
