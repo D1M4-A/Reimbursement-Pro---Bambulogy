@@ -135,6 +135,214 @@ body{background:radial-gradient(circle at 12% 8%,#f0f6ff 0%,#e8f1ff 30%,#f8fbff 
 @keyframes stepFlow{0%{opacity:0;transform:translateX(-10px)}100%{opacity:1;transform:translateX(0)}}
 @keyframes pulseCurrent{0%{box-shadow:0 0 0 0 rgba(8,102,223,.32)}70%{box-shadow:0 0 0 12px rgba(8,102,223,0)}100%{box-shadow:0 0 0 0 rgba(8,102,223,0)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style><style id="ui-premium-refresh">
+:root{
+  --blue:#1459d9;
+  --ink:#0f172a;
+  --muted:#5d6b82;
+  --line:#d7e3f2;
+  --green:#148a58;
+  --orange:#ca8717;
+  --red:#d44d4d;
+  --gold:#f0c36e;
+  --shadow:0 24px 60px rgba(15,23,42,.14);
+}
+html{color-scheme:light}
+body{
+  font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  letter-spacing:.01em;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at top left,rgba(255,255,255,.96),rgba(255,255,255,0) 28%),
+    radial-gradient(circle at 85% 18%,rgba(20,89,217,.14),rgba(20,89,217,0) 26%),
+    linear-gradient(145deg,#eaf1ff 0%,#f6f9ff 42%,#eef4ff 100%) fixed;
+}
+body::before,body::after{
+  content:"";
+  position:fixed;
+  border-radius:999px;
+  filter:blur(18px);
+  pointer-events:none;
+  opacity:.75;
+}
+body::before{width:220px;height:220px;top:-72px;right:-78px;background:radial-gradient(circle,rgba(20,89,217,.18),rgba(20,89,217,0) 72%)}
+body::after{width:180px;height:180px;bottom:34px;left:-58px;background:radial-gradient(circle,rgba(240,195,110,.2),rgba(240,195,110,0) 70%)}
+.stage{padding:24px}
+.phone{
+  width:min(100%,440px);
+  border:1px solid rgba(15,23,42,.22);
+  border-radius:38px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(244,248,255,.93));
+  box-shadow:0 32px 80px rgba(15,23,42,.20),0 8px 24px rgba(20,89,217,.08);
+}
+.phone::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  border:1px solid rgba(255,255,255,.55);
+  pointer-events:none;
+}
+.screen{background:linear-gradient(180deg,rgba(255,255,255,.80),rgba(245,249,255,.92) 100%)}
+.top,.header{position:relative;z-index:1}
+h1,h2,h3,.brand,.metric strong,.hero strong,.amount,.badge,.primary,.secondary,.nav.active{letter-spacing:-.015em}
+h1,h2,h3{color:#0c1830}
+.brand{font-weight:900;color:#102850}
+.logo{
+  background:linear-gradient(135deg,#102c64 0%,#1459d9 55%,#70d4ff 100%);
+  box-shadow:0 14px 34px rgba(20,89,217,.22),inset 0 1px 0 rgba(255,255,255,.35);
+}
+.avatar{
+  background:linear-gradient(135deg,#edf4ff,#d9e8ff);
+  color:#103f99;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 10px 20px rgba(20,89,217,.10);
+}
+.chip,.card,.item,.detailbox,.modal,.travel-box,.payment-proof-box,.travel-detail-box,.travel-expense-table-wrap,.upload{
+  border-color:rgba(177,196,222,.62);
+  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(244,248,255,.96));
+  box-shadow:0 18px 44px rgba(15,23,42,.08),inset 0 1px 0 rgba(255,255,255,.85);
+}
+.chips{padding-bottom:8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  color:#29415f;
+  font-weight:700;
+  border-radius:999px;
+  padding:12px 16px;
+}
+.chip.on{
+  background:linear-gradient(135deg,#102c64,#1459d9 68%,#3479ef);
+  color:#fff;
+  border-color:transparent;
+}
+.grid{gap:16px}
+.card{
+  border-radius:22px;
+  box-shadow:0 18px 38px rgba(15,23,42,.10),0 4px 12px rgba(20,89,217,.05);
+}
+.metric .ico{
+  background:linear-gradient(135deg,rgba(16,44,100,.10),rgba(20,89,217,.18));
+  color:#0f429f;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+}
+.metric strong{font-weight:900}
+.metric small,.item-main small,.helper,.sub,.detailrow span:first-child,.chart-note,.month-label{color:var(--muted)}
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(20,89,217,.16);
+  background:linear-gradient(135deg,#102c64 0%,#1459d9 58%,#3f88ff 100%);
+  color:#fff;
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:auto -10% -45% auto;
+  width:190px;
+  height:190px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.28),rgba(255,255,255,0) 70%);
+}
+.hero small,.hero .helper{color:rgba(255,255,255,.78)}
+.hero strong{color:#fff;text-shadow:0 4px 16px rgba(9,24,50,.24)}
+.item{
+  border-radius:20px;
+  align-items:flex-start;
+}
+.amount{color:#0c1830}
+.badge{font-weight:800}
+.control{
+  border-radius:16px;
+  border-color:rgba(177,196,222,.8);
+  background:rgba(255,255,255,.96);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 18px rgba(15,23,42,.04);
+}
+.control::placeholder{color:#94a3b8}
+.control:focus{
+  border-color:rgba(20,89,217,.65);
+  box-shadow:0 0 0 4px rgba(20,89,217,.10),0 14px 28px rgba(20,89,217,.12);
+}
+.upload{
+  border-style:solid;
+  border-width:1px;
+  color:#103f99;
+  background:linear-gradient(180deg,rgba(244,248,255,.96),rgba(236,244,255,.96));
+}
+.primary,.secondary,.proof-actions a{font-weight:800}
+.primary{
+  background:linear-gradient(135deg,#0f2f6f 0%,#1459d9 58%,#2d77f1 100%);
+  box-shadow:0 18px 34px rgba(20,89,217,.28);
+}
+.secondary{
+  color:#123f9a;
+  border-color:rgba(20,89,217,.22);
+  background:rgba(255,255,255,.92);
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+.bottom{
+  left:12px;
+  right:12px;
+  bottom:12px;
+  height:74px;
+  border:1px solid rgba(177,196,222,.55);
+  border-radius:24px;
+  background:rgba(255,255,255,.78);
+  box-shadow:0 18px 36px rgba(15,23,42,.10);
+}
+.nav{
+  min-width:72px;
+  border-radius:18px;
+  padding:8px 10px;
+}
+.nav.active{
+  background:linear-gradient(180deg,rgba(20,89,217,.13),rgba(20,89,217,.04));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+.login{position:relative;overflow:hidden}
+.login::before{
+  content:"";
+  position:absolute;
+  inset:24px 0 auto;
+  margin:auto;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(20,89,217,.16),rgba(20,89,217,0) 70%);
+  pointer-events:none;
+}
+.login .logo,.login-art,.login h1,.login .sub,.login .helper,.login .control,.login .primary{position:relative;z-index:1}
+.login-art{filter:drop-shadow(0 16px 28px rgba(20,89,217,.16))}
+.toast{border:1px solid rgba(255,255,255,.12)}
+.empty{
+  background:rgba(255,255,255,.60);
+  border-color:rgba(177,196,222,.7);
+}
+.timeline{border-left-color:#c8d8ec}
+.step:before{box-shadow:0 8px 18px rgba(15,23,42,.08)}
+.travel-expense-table th{
+  background:#f5f8fe;
+  color:#233454;
+  font-weight:800;
+}
+.travel-expense-table td,.travel-expense-table th{border-bottom-color:#e8eef8}
+.travel-expense-table tfoot td{background:#edf4ff}
+.modal-wrap{background:rgba(7,16,33,.46);backdrop-filter:blur(10px)}
+.modal{
+  background:linear-gradient(180deg,#ffffff,#f5f9ff);
+  box-shadow:0 28px 56px rgba(15,23,42,.24);
+}
+.report-actions,.proof-actions,.actions,.item-actions{flex-wrap:wrap}
+@media (max-width:470px){
+  body::before,body::after{display:none}
+  .stage{padding:0}
+  .phone{width:100%;height:100vh;border:0;border-radius:0;box-shadow:none}
+  .phone::before{display:none}
+  .bottom{left:10px;right:10px;bottom:10px}
+}
 </style></head><body><div class="stage"><main class="phone"><div id="toast" class="toast">Berhasil</div><div id="claimActionModal" class="modal-wrap"><div class="modal"><h3>Konfirmasi</h3><p id="claimActionMessage">Apakah anda yakin ingin melanjutkan?</p><div class="modal-actions"><button class="secondary" onclick="confirmClaimAction()">Ya</button><button class="secondary danger" onclick="closeClaimActionPopup()">Tidak</button></div></div></div>
 <section id="login" class="screen active login"><div class="logo">R</div><h1>REIMBURSE PRO</h1><p class="sub">Sistem reimbursement seluruh properti Bambulogy</p><div class="login-art">🧾💳</div><input id="email" class="control" placeholder="Email" style="margin-bottom:12px"><input id="password" type="password" class="control" placeholder="Password" style="margin-bottom:14px"><button class="primary" onclick="login()">Masuk</button><p class="helper">Masuk menggunakan akun Admin, Finance, Manager, atau Karyawan.</p></section>
 <section id="home" class="screen"><div class="top"><div class="brand"><div class="logo">R</div>REIMBURSE PRO</div><div id="avatar" class="avatar">AS</div></div><h1 id="greeting">Halo 👋</h1><p class="sub">Kelola reimbursement dengan mudah</p><h2>Unit Bisnis</h2><p class="helper" style="margin-top:-8px">Pilih properti untuk menampilkan statistik dan pengajuan unit tersebut.</p><div class="chips" id="unitFilters"><button class="chip on" onclick="selectUnit('',this)">Semua Unit</button><button class="chip" onclick="selectUnit('ADEM ANYER PARK',this)">🌴 ADEM ANYER PARK</button><button class="chip" onclick="selectUnit('CABINITE PANGALENGAN',this)">🏕 CABINITE PANGALENGAN</button><button class="chip" onclick="selectUnit('JASA KOS KAWAN MANSION',this)">🏢 JASA KOS KAWAN MANSION</button><button class="chip" onclick="selectUnit('JASA KOS MANDIRI MANSION',this)">🏢 JASA KOS MANDIRI MANSION</button><button class="chip" onclick="selectUnit('INDONESIA HIJAU DWIDAYA',this)">🌿 INDONESIA HIJAU DWIDAYA</button></div><h2 id="statsTitle" style="margin-top:0">Statistik Semua Unit</h2><div class="grid"><div class="card metric orange clickable-card" role="button" tabindex="0" onclick="openStatusList('Menunggu Approval')"><div class="ico">◷</div><div class="label">Menunggu Approval</div><strong id="waitingCount">0</strong><small id="waitingAmount">Rp 0</small><div class="card-hint">Klik untuk melihat pengajuan ›</div></div><div class="card metric clickable-card" role="button" tabindex="0" onclick="openStatusList('Diproses Finance')"><div class="ico">▣</div><div class="label">Diproses Finance</div><strong id="financeCount">0</strong><small id="financeAmount">Rp 0</small><div class="card-hint">Klik untuk melihat pengajuan ›</div></div><div class="card metric green clickable-card" role="button" tabindex="0" onclick="openStatusList('Sudah Dibayar')"><div class="ico">✓</div><div class="label">Sudah Dibayar</div><strong id="paidCount">0</strong><small id="paidAmount">Rp 0</small><div class="card-hint">Klik untuk melihat pengajuan ›</div></div><div class="card metric red clickable-card" role="button" tabindex="0" onclick="openStatusList('Ditolak')"><div class="ico">×</div><div class="label">Ditolak</div><strong id="rejectedCount">0</strong><small id="rejectedAmount">Rp 0</small><div class="card-hint">Klik untuk melihat pengajuan ›</div></div></div><div class="hero"><small>Total nilai filter aktif</small><strong id="totalAmount">Rp 0</strong></div><button class="primary" style="margin-top:20px" onclick="openClaimForm()">＋ Ajukan Reimbursement</button><button class="secondary" style="width:100%;margin-top:10px" onclick="logout()">Keluar</button></section>
