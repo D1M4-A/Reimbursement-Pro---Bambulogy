@@ -17,4 +17,12 @@ Gunakan base href sesuai nama repository:
 flutter build web --release --base-href /Reimbursement-Pro---Bambulogy/
 ```
 
-Lalu publish isi folder `build/web` ke branch/folder yang dipakai GitHub Pages.
+## Deploy GitHub Pages (otomatis)
+
+Repository ini menyediakan workflow `.github/workflows/flutter-pages.yml`.
+Setelah push ke `main`, workflow akan:
+
+1. Build Flutter Web dari folder `flutter_web`
+2. Publish `flutter_web/build/web` ke GitHub Pages
+
+Pastikan GitHub Pages repository diarahkan ke **GitHub Actions** sebagai source deployment.
