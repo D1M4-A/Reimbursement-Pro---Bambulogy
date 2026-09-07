@@ -1,4 +1,4 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Deploy site to GitHub Pages
 
 on:
   push:
@@ -21,26 +21,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-
-      - name: Install dependencies
-        working-directory: flutter_web
-        run: flutter pub get
-
-      - name: Build web
-        working-directory: flutter_web
-        run: flutter build web --release --base-href /Reimbursement-Pro---Bambulogy/
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
+      - name: Prepare site artifact
+        run: |
+          mkdir -p /tmp/github-pages-site
+          cp index.html /tmp/github-pages-site/index.html
+          cp 404.html /tmp/github-pages-site/404.html
+          cp ReimbursementPro.html /tmp/github-pages-site/ReimbursementPro.html
+          touch /tmp/github-pages-site/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: flutter_web/build/web
+          path: /tmp/github-pages-site
 
   deploy:
     environment:
