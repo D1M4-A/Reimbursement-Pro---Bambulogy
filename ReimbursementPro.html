@@ -473,4 +473,29 @@ function wrapMutationWithSupabaseSync(name){const original=window[name];if(typeo
 async function hydrateStateFromSupabase(){if(!canUseSupabase())return;try{supabaseClient=window.supabase?.createClient?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):createSupabaseRestClient(SUPABASE_URL,SUPABASE_ANON_KEY);const [{data:remoteUnits,error:unitsError},{data:remoteUsers,error:usersError},{data:remoteClaims,error:claimsError}]=await Promise.all([supabaseClient.from(SUPABASE_UNITS_TABLE).select('name').order('name',{ascending:true}),supabaseClient.from(SUPABASE_USERS_TABLE).select('name,email,password,role').order('name',{ascending:true}),supabaseClient.from(SUPABASE_CLAIMS_TABLE).select('*').order('created_at',{ascending:false})]);if(unitsError)throw unitsError;if(usersError)throw usersError;if(claimsError)throw claimsError;if(Array.isArray(remoteUnits)&&remoteUnits.length)units=remoteUnits.map(row=>row.name).filter(Boolean);if(Array.isArray(remoteUsers)&&remoteUsers.length)users=remoteUsers.map(row=>({name:row.name||'',email:(row.email||'').toLowerCase(),password:row.password||'',role:row.role||'Karyawan'}));if(Array.isArray(remoteClaims)&&remoteClaims.length)claims=remoteClaims.map(dbToClaim);save();saveUnits();saveUsers();supabaseReady=true;const hasRemoteData=(remoteUnits?.length||0)+(remoteUsers?.length||0)+(remoteClaims?.length||0)>0;if(!hasRemoteData)await syncAllStateToSupabase();renderUnitFilters();renderUnitSelectors();renderUnitManager();renderUserManager();renderDashboard();renderApproval();renderFinance();renderReport();if(activeStatus)renderStatusList();if(financeStatus)renderFinanceStatusList()}catch(error){console.error('Supabase init gagal:',error);showSupabaseError('Koneksi Supabase gagal, menggunakan data lokal')}}
 ['startResubmitClaim','deleteClaim','decide','verifyClaim','completePayment','addUnit','editUnit','deleteUnitBusiness','addUser'].forEach(wrapMutationWithSupabaseSync);
 hydrateStateFromSupabase();
+function hasRole(...roles){return roles.includes(currentUser?.role||'')}
+function getScopedClaims(){if(!currentUser)return[];return currentUser.role==='Karyawan'?claims.filter(c=>c.employee===currentUser.name):claims}
+function withScopedClaims(fn){const allClaims=claims;claims=getScopedClaims();try{return fn()}finally{claims=allClaims}}
+function canAccessClaimById(id){return getScopedClaims().some(c=>c.id===id)}
+function canAccessPage(page){if(!currentUser)return page==='login';if(page==='settings')return hasRole('Admin');if(page==='approval')return hasRole('Manager','Admin');if(page==='finance'||page==='financeStatusList'||page==='payment')return hasRole('Finance','Admin');if(page==='report'||page==='reportClaims')return hasRole('Manager','Finance','Admin');if(page==='form')return hasRole('Karyawan','Admin');return true}
+function updateProtectedNav(){const navRules={home:['Karyawan','Manager','Finance','Admin'],form:['Karyawan','Admin'],approval:['Manager','Admin'],finance:['Finance','Admin'],report:['Manager','Finance','Admin'],settings:['Admin']};Object.entries(navRules).forEach(([page,roles])=>{const btn=document.querySelector(`.nav[data-page="${page}"]`);if(!btn)return;btn.style.display=currentUser&&roles.includes(currentUser.role)?'grid':'none'})}
+const baseGo=go;
+go=function(id){if(!canAccessPage(id)){if(id!=='home'&&id!=='login')notify('Akses ditolak untuk halaman ini');id=currentUser?'home':'login'}const result=baseGo(id);updateProtectedNav();return result};
+const scopedRenderFns=['renderDashboard','renderStatusList','renderApproval','renderFinance','renderFinanceStatusList','renderPayment','updatePaymentTotal','filteredReport','renderReport','renderReportClaims'];
+scopedRenderFns.forEach(name=>{const original=window[name];if(typeof original!=='function')return;window[name]=function(...args){return withScopedClaims(()=>original.apply(this,args))}});
+const baseOpenDetail=openDetail;
+openDetail=function(id){if(!canAccessClaimById(id))return notify('Data karyawan lain tidak dapat diakses');return withScopedClaims(()=>baseOpenDetail(id))};
+const baseStartEditClaim=startEditClaim;
+startEditClaim=function(id){if(!canAccessClaimById(id))return notify('Data karyawan lain tidak dapat diakses');return baseStartEditClaim(id)};
+const baseStartResubmitClaim=startResubmitClaim;
+startResubmitClaim=function(id){if(!canAccessClaimById(id))return notify('Data karyawan lain tidak dapat diakses');return baseStartResubmitClaim(id)};
+const baseDeleteClaim=deleteClaim;
+deleteClaim=function(id){if(!canAccessClaimById(id))return notify('Data karyawan lain tidak dapat diakses');return baseDeleteClaim(id)};
+const baseDecide=decide;
+decide=async function(id,ok){if(!hasRole('Manager','Admin'))return notify('Hanya Manager/Admin yang boleh approval');if(!canAccessClaimById(id))return notify('Data karyawan lain tidak dapat diakses');return baseDecide(id,ok)};
+const baseVerifyClaim=verifyClaim;
+verifyClaim=function(id){if(!hasRole('Finance','Admin'))return notify('Hanya Finance/Admin yang boleh verifikasi');if(!canAccessClaimById(id))return notify('Data karyawan lain tidak dapat diakses');return baseVerifyClaim(id)};
+const baseCompletePayment=completePayment;
+completePayment=function(){if(!hasRole('Finance','Admin'))return notify('Hanya Finance/Admin yang boleh proses pembayaran');return baseCompletePayment()};
+updateProtectedNav();
 </script></body></html>
