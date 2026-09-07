@@ -188,6 +188,7 @@ body::after{width:180px;height:180px;bottom:34px;left:-58px;background:radial-gr
   pointer-events:none;
 }
 .screen{background:linear-gradient(180deg,rgba(255,255,255,.80),rgba(245,249,255,.92) 100%)}
+.screen{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
 .top,.header{position:relative;z-index:1}
 h1,h2,h3,.brand,.metric strong,.hero strong,.amount,.badge,.primary,.secondary,.nav.active{letter-spacing:-.015em}
 h1,h2,h3{color:#0c1830}
@@ -288,10 +289,13 @@ h1,h2,h3{color:#0c1830}
   right:12px;
   bottom:12px;
   height:74px;
+  min-height:74px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
   border:1px solid rgba(177,196,222,.55);
   border-radius:24px;
   background:rgba(255,255,255,.78);
   box-shadow:0 18px 36px rgba(15,23,42,.10);
+  z-index:35;
 }
 .nav{
   min-width:72px;
@@ -339,9 +343,9 @@ h1,h2,h3{color:#0c1830}
 @media (max-width:470px){
   body::before,body::after{display:none}
   .stage{padding:0}
-  .phone{width:100%;height:100vh;border:0;border-radius:0;box-shadow:none}
+  .phone{width:100%;height:100vh;height:100dvh;border:0;border-radius:0;box-shadow:none}
   .phone::before{display:none}
-  .bottom{left:10px;right:10px;bottom:10px}
+  .bottom{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom,0px))}
 }
 </style></head><body><div class="stage"><main class="phone"><div id="toast" class="toast">Berhasil</div><div id="claimActionModal" class="modal-wrap"><div class="modal"><h3>Konfirmasi</h3><p id="claimActionMessage">Apakah anda yakin ingin melanjutkan?</p><div class="modal-actions"><button class="secondary" onclick="confirmClaimAction()">Ya</button><button class="secondary danger" onclick="closeClaimActionPopup()">Tidak</button></div></div></div>
 <section id="login" class="screen active login"><div class="logo">R</div><h1>REIMBURSE PRO</h1><p class="sub">Sistem reimbursement seluruh properti Bambulogy</p><div class="login-art">🧾💳</div><input id="email" class="control" placeholder="Email" style="margin-bottom:12px"><input id="password" type="password" class="control" placeholder="Password" style="margin-bottom:14px"><button class="primary" onclick="login()">Masuk</button><p class="helper">Masuk menggunakan akun Admin, Finance, Manager, atau Karyawan.</p></section>
