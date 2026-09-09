@@ -13,6 +13,7 @@ create table if not exists public.reimbursement_users (
   name text not null,
   email text not null unique,
   password text not null,
+  whatsapp_number text,
   role text not null check (role in ('Admin','Finance','Manager','Karyawan')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -70,6 +71,7 @@ create table if not exists public.reimbursement_claim_audit_logs (
   created_at timestamptz not null default now()
 );
 
+alter table public.reimbursement_users add column if not exists whatsapp_number text;
 alter table public.reimbursement_claims add column if not exists owner_email text;
 alter table public.reimbursement_claims add column if not exists updated_at timestamptz not null default now();
 alter table public.reimbursement_claims add column if not exists odoo_bill_id bigint;
