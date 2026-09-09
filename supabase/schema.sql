@@ -41,6 +41,13 @@ create table if not exists public.reimbursement_claims (
   verified_at timestamptz,
   paid_at date,
   payment_method text,
+  created_by_email text,
+  updated_by_email text,
+  approved_by_email text,
+  verified_by_email text,
+  paid_by_email text,
+  deleted_at timestamptz,
+  deleted_by_email text,
   receipt jsonb,
   payment_proof jsonb,
   odoo_bill_id bigint,
@@ -49,12 +56,33 @@ create table if not exists public.reimbursement_claims (
   odoo_sync_error text
 );
 
+create table if not exists public.reimbursement_claim_audit_logs (
+  id text primary key,
+  claim_id text not null references public.reimbursement_claims(id),
+  action text not null,
+  actor_email text,
+  actor_name text,
+  actor_role text,
+  source text not null default 'web-app',
+  before_data jsonb,
+  after_data jsonb,
+  metadata jsonb,
+  created_at timestamptz not null default now()
+);
+
 alter table public.reimbursement_claims add column if not exists owner_email text;
 alter table public.reimbursement_claims add column if not exists updated_at timestamptz not null default now();
 alter table public.reimbursement_claims add column if not exists odoo_bill_id bigint;
 alter table public.reimbursement_claims add column if not exists odoo_bill_name text;
 alter table public.reimbursement_claims add column if not exists odoo_synced_at timestamptz;
 alter table public.reimbursement_claims add column if not exists odoo_sync_error text;
+alter table public.reimbursement_claims add column if not exists created_by_email text;
+alter table public.reimbursement_claims add column if not exists updated_by_email text;
+alter table public.reimbursement_claims add column if not exists approved_by_email text;
+alter table public.reimbursement_claims add column if not exists verified_by_email text;
+alter table public.reimbursement_claims add column if not exists paid_by_email text;
+alter table public.reimbursement_claims add column if not exists deleted_at timestamptz;
+alter table public.reimbursement_claims add column if not exists deleted_by_email text;
 
 create index if not exists idx_reimbursement_claims_owner_email on public.reimbursement_claims(owner_email);
 create index if not exists idx_reimbursement_claims_status on public.reimbursement_claims(status);
@@ -63,6 +91,9 @@ create index if not exists idx_reimbursement_claims_date on public.reimbursement
 create index if not exists idx_reimbursement_claims_status_unit_date on public.reimbursement_claims(status, unit, date desc);
 create index if not exists idx_reimbursement_claims_owner_status_created on public.reimbursement_claims(owner_email, status, created_at desc);
 create index if not exists idx_reimbursement_claims_status_created on public.reimbursement_claims(status, created_at desc);
+create index if not exists idx_reimbursement_claims_deleted_at on public.reimbursement_claims(deleted_at);
+create index if not exists idx_reimbursement_claim_audit_logs_claim_created on public.reimbursement_claim_audit_logs(claim_id, created_at desc);
+create index if not exists idx_reimbursement_claim_audit_logs_actor_created on public.reimbursement_claim_audit_logs(actor_email, created_at desc);
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -108,6 +139,7 @@ set public = excluded.public,
 alter table public.reimbursement_units enable row level security;
 alter table public.reimbursement_users enable row level security;
 alter table public.reimbursement_claims enable row level security;
+alter table public.reimbursement_claim_audit_logs enable row level security;
 
 drop policy if exists reimbursement_units_full_access on public.reimbursement_units;
 create policy reimbursement_units_full_access
@@ -128,6 +160,14 @@ with check (true);
 drop policy if exists reimbursement_claims_full_access on public.reimbursement_claims;
 create policy reimbursement_claims_full_access
 on public.reimbursement_claims
+for all
+to anon, authenticated
+using (true)
+with check (true);
+
+drop policy if exists reimbursement_claim_audit_logs_full_access on public.reimbursement_claim_audit_logs;
+create policy reimbursement_claim_audit_logs_full_access
+on public.reimbursement_claim_audit_logs
 for all
 to anon, authenticated
 using (true)
