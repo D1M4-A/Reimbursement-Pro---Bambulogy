@@ -22,6 +22,7 @@ create table if not exists public.reimbursement_users (
 create table if not exists public.reimbursement_claims (
   id text primary key,
   employee text not null,
+  owner_email text,
   unit text not null,
   category text not null,
   date date not null,
@@ -47,11 +48,13 @@ create table if not exists public.reimbursement_claims (
   odoo_sync_error text
 );
 
+alter table public.reimbursement_claims add column if not exists owner_email text;
 alter table public.reimbursement_claims add column if not exists odoo_bill_id bigint;
 alter table public.reimbursement_claims add column if not exists odoo_bill_name text;
 alter table public.reimbursement_claims add column if not exists odoo_synced_at timestamptz;
 alter table public.reimbursement_claims add column if not exists odoo_sync_error text;
 
+create index if not exists idx_reimbursement_claims_owner_email on public.reimbursement_claims(owner_email);
 create index if not exists idx_reimbursement_claims_status on public.reimbursement_claims(status);
 create index if not exists idx_reimbursement_claims_unit on public.reimbursement_claims(unit);
 create index if not exists idx_reimbursement_claims_date on public.reimbursement_claims(date);
