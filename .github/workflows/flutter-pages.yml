@@ -25,11 +25,31 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Prepare site artifact
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           mkdir -p /tmp/github-pages-site
           cp index.html /tmp/github-pages-site/index.html
           cp 404.html /tmp/github-pages-site/404.html
           cp ReimbursementPro.html /tmp/github-pages-site/ReimbursementPro.html
+          cp runtime-config.js /tmp/github-pages-site/runtime-config.js
+          python - <<'PY' > /tmp/github-pages-site/runtime-config.js
+          import json, os
+
+          config = {
+              "SUPABASE_URL": os.getenv("SUPABASE_URL", "").strip(),
+              "SUPABASE_ANON_KEY": os.getenv("SUPABASE_ANON_KEY", "").strip(),
+          }
+
+          print("window.RUNTIME_CONFIG = Object.assign(window.RUNTIME_CONFIG || {}, {")
+          for key, value in config.items():
+              print(f"  {key}: {json.dumps(value)},")
+          print("});")
+          print("Object.entries(window.RUNTIME_CONFIG).forEach(([key, value]) => {")
+          print("  if (typeof value === 'string' && value) window[key] = value;")
+          print("});")
+          PY
           touch /tmp/github-pages-site/.nojekyll
 
       - name: Upload artifact
