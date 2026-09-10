@@ -742,6 +742,12 @@ async function login() {
     return
   } catch (error) {
     console.error('Login Supabase gagal:', error);
+    if (canUseSupabase()) try {
+      await loginWithSupabaseRest(email, password, remember);
+      return
+    } catch (restError) {
+      console.error('Fallback login REST Supabase gagal:', restError)
+    }
     const localUser = await verifyLocalUserCredentials(email, password).catch(localError => {
       throw new Error(localError?.message || 'Validasi password gagal')
     });
@@ -763,6 +769,14 @@ async function login() {
         if (!isSupabaseNetworkError(migrationError)) return notify(formatSupabaseAuthError(migrationError))
       }
     }
+    updateAuthEmptyState();
+    return notify(formatSupabaseAuthError(error))
+  }
+  if (!canUseSupabaseAuth() && canUseSupabase() && navigator.onLine) try {
+    await loginWithSupabaseRest(email, password, remember);
+    return
+  } catch (error) {
+    console.error('Login REST Supabase gagal:', error);
     updateAuthEmptyState();
     return notify(formatSupabaseAuthError(error))
   }
@@ -986,6 +1000,43 @@ function formatSupabaseAuthError(error, fallback = 'Autentikasi Supabase gagal')
 function isSupabaseNetworkError(error) {
   const msg = String(error?.message || error?.error_description || error?.error || '').toLowerCase();
   return msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch')
+}
+
+function getSupabaseAuthBase() {
+  return SUPABASE_URL.replace(/\/+$/, '') + '/auth/v1'
+}
+
+async function loginWithSupabaseRest(email, password, remember) {
+  if (!canUseSupabase() || !navigator.onLine) return false;
+  const res = await fetch(getSupabaseAuthBase() + '/token?grant_type=password', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      password
+    })
+  });
+  if (!res.ok) throw new Error(await parseSupabaseHttpError(res));
+  const payload = await res.json(),
+    authUser = payload?.user;
+  if (!authUser?.email) throw new Error('Akun Supabase tidak valid');
+  let activeUser = null;
+  try {
+    activeUser = await syncUserFromSupabaseAuth(authUser, !!findUserByEmail(authUser.email || email))
+  } catch (profileError) {
+    console.error('Sinkron profil user setelah login REST gagal:', profileError);
+    const fallbackUser = buildUserFromAuth(authUser, findUserByEmail(authUser.email || email) || {
+      email: authUser.email || email,
+      role: 'Karyawan'
+    });
+    activeUser = upsertLocalUser(fallbackUser) || fallbackUser
+  }
+  await finalizeSuccessfulLogin(activeUser, remember, password);
+  updateAuthEmptyState();
+  return true
 }
 
 function canUseSupabaseAuth() {
