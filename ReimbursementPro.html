@@ -536,6 +536,10 @@ function hasSavedSupabaseConfig() {
   return !!(normalizeSupabaseUrl(localStorage.getItem('rpSupabaseUrl') || '') && (localStorage.getItem('rpSupabaseAnonKey') || '').trim())
 }
 
+function shouldShowLoginSupabaseCard() {
+  return !isAppInitializing && !canUseSupabase()
+}
+
 function populateSupabaseConfigInputs() {
   const url = localStorage.getItem('rpSupabaseUrl') || '',
     key = localStorage.getItem('rpSupabaseAnonKey') || '';
@@ -567,10 +571,11 @@ async function waitForAppInitialization() {
 }
 
 function updateAuthEmptyState() {
-  const empty = !users.length;
+  const empty = !users.length,
+    showLoginSupabaseCard = shouldShowLoginSupabaseCard();
   if (el('setupAdminCard')) el('setupAdminCard').style.display = !isAppInitializing && empty ? 'block' : 'none';
-  if (el('loginSupabaseCard')) el('loginSupabaseCard').style.display = 'none';
-  if (el('loginHelperText')) el('loginHelperText').textContent = isAppInitializing ? 'Sedang memuat data akun...' : empty ? 'Belum ada akun. Buat admin pertama untuk mulai menggunakan aplikasi.' : 'Masuk hanya dengan email dan password akun Anda.';
+  if (el('loginSupabaseCard')) el('loginSupabaseCard').style.display = showLoginSupabaseCard ? 'block' : 'none';
+  if (el('loginHelperText')) el('loginHelperText').textContent = isAppInitializing ? 'Sedang memuat data akun...' : empty ? showLoginSupabaseCard ? 'Belum ada akun lokal. Jika akun tersimpan di server, isi config Supabase di bawah lalu muat akun.' : 'Belum ada akun. Buat admin pertama untuk mulai menggunakan aplikasi.' : showLoginSupabaseCard ? 'Jika ini device baru, isi config Supabase di bawah untuk memuat akun server sebelum login.' : 'Masuk hanya dengan email dan password akun Anda.';
   if (!empty && el('setupAdminPassword'))['setupAdminName', 'setupAdminEmail', 'setupAdminPassword'].forEach(id => {
     if (el(id)) el(id).value = ''
   })
@@ -752,10 +757,16 @@ async function login() {
     password = (el('password')?.value || '');
   const remember = !!el('rememberLogin')?.checked;
   if (!email || !password) return notify('Masukkan email dan password');
-  if (canUseSupabase() && (!users.length || !users.some(x => x.email === email))) await refreshUsersFromSupabase();
-  if (!users.length) return notify('Data akun belum siap. Coba lagi sebentar.');
+  let attemptedRemoteLoad = false;
+  if (canUseSupabase() && (!users.length || !users.some(x => x.email === email))) attemptedRemoteLoad = await refreshUsersFromSupabase();
+  if (!users.length) return notify(canUseSupabase() ? 'Data akun belum siap. Coba lagi sebentar.' : 'Akun di device ini belum termuat. Isi config Supabase lalu klik Muat Akun Server.');
   const user = users.find(x => x.email === email);
-  if (!user) return notify('Email atau password salah');
+  if (!user) {
+    updateAuthEmptyState();
+    if (!canUseSupabase()) return notify('Akun belum termuat di device ini. Isi config Supabase lalu klik Muat Akun Server');
+    if (attemptedRemoteLoad && !supabaseReady) return notify('Akun server belum berhasil dimuat. Cek koneksi Supabase lalu coba lagi');
+    return notify('Email atau password salah')
+  }
   let passwordValid = false;
   try {
     passwordValid = await verifyStoredPassword(user.password || '', password)
