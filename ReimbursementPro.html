@@ -1036,7 +1036,7 @@ async function syncUserFromSupabaseAuth(authUser, allowProfileCreation = false) 
     authUserId: authUser.id || '',
     email: authUser.email || ''
   });
-  if (!profile && (allowProfileCreation || localUser || normalizeEmail(authUser.email || ''))) {
+  if (!profile && (allowProfileCreation || localUser || authUser?.email)) {
     const draftProfile = buildUserFromAuth(authUser, localUser || {});
     await upsertSupabaseUserProfile(draftProfile);
     profile = await fetchSupabaseUserProfile({
