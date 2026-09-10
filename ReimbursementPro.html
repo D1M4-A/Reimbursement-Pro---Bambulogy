@@ -488,6 +488,25 @@ function updateGreeting() {
 }
 let appBootstrapPromise = Promise.resolve(),
   isAppInitializing = true;
+const APP_INIT_TIMEOUT_MS = 12000,
+  SUPABASE_AUTH_TIMEOUT_MS = 10000;
+
+function createTimeoutError(label) {
+  const error = new Error((label || 'Operasi') + ' timeout');
+  error.name = 'TimeoutError';
+  return error
+}
+
+async function withTimeout(promise, timeoutMs, label) {
+  let timer = null;
+  try {
+    return await Promise.race([promise, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(createTimeoutError(label)), Math.max(1000, Number(timeoutMs) || 0))
+    })])
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
+}
 
 function setAuthLoadingState(loading) {
   isAppInitializing = !!loading;
@@ -535,8 +554,14 @@ function mirrorSupabaseConfigInputs(source) {
 }
 async function waitForAppInitialization() {
   try {
-    await appBootstrapPromise
-  } catch (_) {}
+    await withTimeout(appBootstrapPromise, APP_INIT_TIMEOUT_MS, 'Inisialisasi aplikasi')
+  } catch (error) {
+    console.error('Menunggu inisialisasi aplikasi gagal:', error);
+    if (isAppInitializing) {
+      setAuthLoadingState(false);
+      updateAuthEmptyState()
+    }
+  }
 }
 
 function updateAuthEmptyState() {
@@ -731,10 +756,10 @@ async function login() {
     const {
       data,
       error
-    } = await supabaseClient.auth.signInWithPassword({
+    } = await withTimeout(supabaseClient.auth.signInWithPassword({
       email,
       password
-    });
+    }), SUPABASE_AUTH_TIMEOUT_MS, 'Login Supabase');
     if (error) throw error;
     const activeUser = await syncUserFromSupabaseAuth(data?.user || data?.session?.user, false);
     await finalizeSuccessfulLogin(activeUser, remember, password);
@@ -993,13 +1018,14 @@ function formatSupabaseAuthError(error, fallback = 'Autentikasi Supabase gagal')
   if (msg.includes('invalid login credentials')) return 'Email atau password salah';
   if (msg.includes('email not confirmed')) return 'Email belum dikonfirmasi di Supabase';
   if (msg.includes('user already registered')) return 'Email sudah terdaftar di Supabase';
+  if (msg.includes('timeout')) return 'Koneksi ke Supabase timeout';
   if (msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch')) return 'Koneksi ke Supabase gagal';
   return raw
 }
 
 function isSupabaseNetworkError(error) {
   const msg = String(error?.message || error?.error_description || error?.error || '').toLowerCase();
-  return msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch')
+  return msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch') || msg.includes('timeout')
 }
 
 function getSupabaseAuthBase() {
@@ -1049,7 +1075,7 @@ async function getSupabaseSession() {
   const {
     data,
     error
-  } = await supabaseClient.auth.getSession();
+  } = await withTimeout(supabaseClient.auth.getSession(), SUPABASE_AUTH_TIMEOUT_MS, 'Pemulihan sesi Supabase');
   if (error) throw error;
   return data?.session || null
 }
