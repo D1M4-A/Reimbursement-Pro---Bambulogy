@@ -10,9 +10,10 @@ create table if not exists public.reimbursement_units (
 -- Tabel user aplikasi (sesuai form login saat ini)
 create table if not exists public.reimbursement_users (
   id bigint generated always as identity primary key,
+  auth_user_id uuid unique references auth.users(id) on delete set null,
   name text not null,
   email text not null unique,
-  password text not null,
+  password text,
   whatsapp_number text,
   role text not null check (role in ('Admin','Finance','Manager','Karyawan')),
   created_at timestamptz not null default now(),
@@ -72,6 +73,8 @@ create table if not exists public.reimbursement_claim_audit_logs (
 );
 
 alter table public.reimbursement_users add column if not exists whatsapp_number text;
+alter table public.reimbursement_users add column if not exists auth_user_id uuid references auth.users(id) on delete set null;
+alter table public.reimbursement_users alter column password drop not null;
 alter table public.reimbursement_claims add column if not exists owner_email text;
 alter table public.reimbursement_claims add column if not exists updated_at timestamptz not null default now();
 alter table public.reimbursement_claims add column if not exists odoo_bill_id bigint;
@@ -96,6 +99,7 @@ create index if not exists idx_reimbursement_claims_status_created on public.rei
 create index if not exists idx_reimbursement_claims_deleted_at on public.reimbursement_claims(deleted_at);
 create index if not exists idx_reimbursement_claim_audit_logs_claim_created on public.reimbursement_claim_audit_logs(claim_id, created_at desc);
 create index if not exists idx_reimbursement_claim_audit_logs_actor_created on public.reimbursement_claim_audit_logs(actor_email, created_at desc);
+create unique index if not exists idx_reimbursement_users_auth_user_id on public.reimbursement_users(auth_user_id) where auth_user_id is not null;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -118,6 +122,43 @@ create trigger set_reimbursement_users_updated_at
 before update on public.reimbursement_users
 for each row
 execute function public.set_updated_at();
+
+create or replace function public.sync_reimbursement_user_from_auth()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  next_name text;
+  next_role text;
+  next_whatsapp text;
+begin
+  next_name := trim(coalesce(new.raw_user_meta_data->>'name', split_part(coalesce(new.email, ''), '@', 1), ''));
+  next_role := coalesce(new.raw_user_meta_data->>'role', 'Karyawan');
+  if next_role not in ('Admin','Finance','Manager','Karyawan') then
+    next_role := 'Karyawan';
+  end if;
+  next_whatsapp := nullif(trim(coalesce(new.raw_user_meta_data->>'whatsapp_number', new.raw_user_meta_data->>'whatsappNumber', '')), '');
+
+  insert into public.reimbursement_users (auth_user_id, name, email, role, whatsapp_number)
+  values (new.id, next_name, coalesce(new.email, ''), next_role, next_whatsapp)
+  on conflict (email) do update
+  set auth_user_id = excluded.auth_user_id,
+      name = case when excluded.name <> '' then excluded.name else public.reimbursement_users.name end,
+      role = excluded.role,
+      whatsapp_number = coalesce(excluded.whatsapp_number, public.reimbursement_users.whatsapp_number),
+      updated_at = now();
+
+  return new;
+end;
+$$;
+
+drop trigger if exists sync_reimbursement_user_from_auth on auth.users;
+create trigger sync_reimbursement_user_from_auth
+after insert or update on auth.users
+for each row
+execute function public.sync_reimbursement_user_from_auth();
 
 drop trigger if exists set_reimbursement_claims_updated_at on public.reimbursement_claims;
 create trigger set_reimbursement_claims_updated_at

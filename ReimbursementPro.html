@@ -353,42 +353,11 @@ h1,h2,h3{color:#0c1830}
 <section id="form" class="screen"><div class="header"><button class="back" onclick="closeClaimForm()">←</button><h1 id="formTitle">Ajukan Reimbursement</h1></div><div id="formModeBanner" class="form-mode-banner">Mode edit pengajuan menunggu approval.</div><div class="form-group"><label>Unit Bisnis Tujuan *</label><select id="claimUnit" class="control"><option value="">Pilih unit bisnis tujuan</option><option>ADEM ANYER PARK</option><option>CABINITE PANGALENGAN</option><option>JASA KOS KAWAN MANSION</option><option>JASA KOS MANDIRI MANSION</option><option>INDONESIA HIJAU DWIDAYA</option></select></div><div class="form-group"><label>Kategori Biaya *</label><select id="category" class="control" onchange="toggleTravelFields()"><option>Biaya Transportasi</option><option>Biaya ATK</option><option>Biaya Bangunan</option><option>Biaya Perawatan</option><option>Biaya Marketing</option><option>Biaya Listrik</option><option>Biaya Umum</option><option>Biaya Perjalanan Dinas</option></select></div><div id="travelFieldsBox" class="travel-box"><p class="title">Detail Perjalanan Dinas</p><div class="travel-grid"><div class="form-group"><label>Kota Asal *</label><input id="travelOrigin" class="control" placeholder="Contoh: Jakarta"></div><div class="form-group"><label>Kota Tujuan *</label><input id="travelDestination" class="control" placeholder="Contoh: Bandung"></div><div class="form-group"><label>Tanggal Berangkat *</label><input id="travelStartDate" type="date" class="control"></div><div class="form-group"><label>Tanggal Pulang *</label><input id="travelEndDate" type="date" class="control"></div><div class="form-group"><label>Moda Transportasi *</label><input id="travelTransport" class="control" placeholder="Contoh: Kereta, Pesawat"></div><div class="form-group"><label>Keperluan Dinas *</label><input id="travelPurpose" class="control" placeholder="Contoh: Meeting operasional"></div></div><div class="travel-expense-wrap"><div class="travel-expense-head"><b>Rincian Biaya Perjalanan *</b><button class="secondary" type="button" onclick="addTravelExpenseRow()">＋ Tambah</button></div><div class="travel-expense-table-wrap"><table class="travel-expense-table"><thead><tr><th>Jenis Biaya</th><th>Nominal (Rp)</th><th>Aksi</th></tr></thead><tbody id="travelExpenseBody"></tbody><tfoot><tr><td colspan="2">Total Rincian</td><td id="travelExpenseTotal">Rp 0</td></tr></tfoot></table></div><small class="helper">Contoh: akomodasi, transportasi, makan, tol, parkir, dll.</small></div></div><div class="form-group"><label>Tanggal Transaksi *</label><input id="date" type="date" class="control"></div><div class="form-group"><label>Nominal *</label><input id="amount" type="number" min="1" class="control" placeholder="Contoh: 250000"><small id="travelAmountHint" class="helper" style="display:none;margin-top:6px">Nominal otomatis mengikuti total rincian perjalanan dinas.</small></div><div class="form-group"><label>Vendor *</label><input id="vendor" class="control" placeholder="Nama vendor"></div><div class="form-group"><label>Keterangan *</label><textarea id="description" class="control" rows="3" placeholder="Jelaskan keperluan biaya"></textarea></div><div class="form-group"><label>Upload Nota</label><label class="upload">📷 Pilih nota<input id="receipt" type="file" accept="image/*,.pdf" hidden onchange="readReceipt(event)"><span id="fileName" class="helper" style="display:block"></span></label></div><div class="form-group"><label>Bank Penerima *</label><select id="bank" class="control"><option value="">Pilih bank</option><option>BCA</option><option>MANDIRI</option><option>BNI</option><option>BRI</option></select></div><div class="form-group"><label>Nomor Rekening *</label><input id="accountNumber" inputmode="numeric" class="control" placeholder="Masukkan nomor rekening"></div><div class="form-group"><label>Nama Pemilik Rekening *</label><input id="accountName" class="control" placeholder="Masukkan nama pemilik rekening"></div><button id="formSubmitButton" class="primary" onclick="submitClaim()">✈ Kirim Pengajuan</button></section>
 <section id="detail" class="screen"><div class="header"><button class="back" onclick="go(detailSource==='finance'?'financeStatusList':activeStatus?'statusList':detailSource==='report'?'reportClaims':'home')">←</button><h1>Detail Pengajuan</h1></div><div class="statusline"><b id="detailId" class="badge blue"></b><span id="detailStatus" class="badge"></span></div><div class="detailbox"><div class="detailrow"><span>Nama Karyawan</span><b id="detailEmployee"></b></div><div class="detailrow"><span>Unit Bisnis</span><span id="detailUnit"></span></div><div class="detailrow"><span>Kategori</span><span id="detailCategory"></span></div><div class="detailrow"><span>Tanggal</span><span id="detailDate"></span></div><div class="detailrow"><span>Vendor</span><span id="detailVendor"></span></div><div class="detailrow"><span>Total</span><b id="detailAmount" style="font-size:21px"></b></div><hr style="border:0;border-top:1px solid var(--line)"><p><b>Deskripsi</b></p><p id="detailDescription" class="sub"></p><div id="detailTravelInfo"></div><hr style="border:0;border-top:1px solid var(--line)"><p><b>Rekening Penerima</b></p><div class="detailrow"><span>Bank</span><span id="detailBank"></span></div><div class="detailrow"><span>Nomor Rekening</span><span id="detailAccount"></span></div><div class="detailrow"><span>Nama Pemilik</span><span id="detailAccountName"></span></div><div id="detailReceipt"></div><div id="detailPaymentProof"></div></div><div id="detailTimeline" class="timeline"></div><div class="card" style="margin-top:14px"><b>Riwayat Audit</b><div id="detailAuditTrail" class="list" style="margin-top:10px"></div></div><button class="secondary" style="width:100%" onclick="downloadDetail()">▣ Unduh Detail Pengajuan</button></section>
 <section id="statusList" class="screen"><div class="header"><button class="back" onclick="go('home')">←</button><h1 id="statusListTitle">Daftar Pengajuan</h1></div><div class="hero status-summary"><small id="statusListUnit">Semua Unit</small><strong id="statusListTotal">Rp 0</strong><small id="statusListCount">0 pengajuan</small></div><div class="status-toolbar"><input id="statusSearch" class="control" placeholder="Cari nama, kategori, atau vendor..." oninput="renderStatusList()"></div><div id="statusListContent" class="list"></div></section><section id="approval" class="screen"><div class="top"><div class="brand"><div class="logo">R</div>REIMBURSE PRO</div><div class="avatar">MG</div></div><h1>Dashboard Approval</h1><p class="sub">Kelola dan setujui pengajuan dari seluruh unit.</p><div class="filter-row"><select id="approvalUnit" class="control" onchange="renderApproval()"><option value="">Semua Unit</option><option>ADEM ANYER PARK</option><option>CABINITE PANGALENGAN</option><option>JASA KOS KAWAN MANSION</option><option>JASA KOS MANDIRI MANSION</option><option>INDONESIA HIJAU DWIDAYA</option></select></div><div class="grid"><div class="card metric orange"><div class="label">Perlu Approve</div><strong id="approvalCount">0</strong><small id="approvalAmount">Rp 0</small></div><div class="card metric green"><div class="label">Disetujui Hari Ini</div><strong id="approvedToday">0</strong><small id="approvedTodayAmount">Rp 0</small></div></div><h2>Pengajuan Menunggu Approval</h2><div id="approvalList" class="list"></div></section><section id="finance" class="screen"><div class="top"><div class="brand"><div class="logo">R</div>REIMBURSE PRO</div><div class="avatar">FI</div></div><h1>Dashboard Finance</h1><p class="sub">Ringkasan reimbursement dalam proses.</p><div class="filter-row"><select id="financeUnit" class="control" onchange="renderFinance()"><option value="">Semua Unit</option><option>ADEM ANYER PARK</option><option>CABINITE PANGALENGAN</option><option>JASA KOS KAWAN MANSION</option><option>JASA KOS MANDIRI MANSION</option><option>INDONESIA HIJAU DWIDAYA</option></select></div><div class="grid finance-grid"><div class="card metric orange clickable-card" role="button" tabindex="0" onclick="openFinanceList('Diproses Finance')"><div class="label">Perlu Verifikasi</div><strong id="finVerifyCount">0</strong><small id="finVerifyAmount">Rp 0</small><div class="card-hint">Klik untuk cek satu per satu ›</div></div><div class="card metric clickable-card" role="button" tabindex="0" onclick="openFinanceList('Siap Dibayar')"><div class="label">Siap Dibayar</div><strong id="finReadyCount">0</strong><small id="finReadyAmount">Rp 0</small><div class="card-hint">Klik untuk cek satu per satu ›</div></div><div class="card metric green clickable-card" role="button" tabindex="0" onclick="openFinanceList('Sudah Dibayar')"><div class="label">Sudah Dibayar</div><strong id="finPaidCount">0</strong><small id="finPaidAmount">Rp 0</small><div class="card-hint">Klik untuk cek satu per satu ›</div></div><div class="card metric"><div class="label">Total Nilai</div><strong id="finTotal">Rp 0</strong><small>Seluruh klaim Finance</small></div></div><h2>Antrian Finance</h2><div id="financeList" class="list"></div></section><section id="financeStatusList" class="screen"><div class="header"><button class="back" onclick="go('finance')">←</button><h1 id="financeStatusTitle">Daftar Finance</h1></div><div class="hero status-summary"><small id="financeStatusUnit">Semua Unit</small><strong id="financeStatusTotal">Rp 0</strong><small id="financeStatusCount">0 pengajuan</small></div><div class="status-toolbar"><input id="financeStatusSearch" class="control" placeholder="Cari nama, unit, kategori, atau vendor..." oninput="renderFinanceStatusList()"></div><div id="financeStatusContent" class="list"></div></section><section id="report" class="screen"><div class="top"><div class="brand"><div class="logo">R</div>REIMBURSE PRO</div><div class="avatar">AS</div></div><h1>Laporan</h1><p class="sub">Pantau dan analisis data reimbursement.</p><div class="filter-row"><input id="reportMonth" type="month" class="control" onchange="renderReport()"><select id="reportUnit" class="control" onchange="renderReport()"><option value="">Semua Unit</option><option>ADEM ANYER PARK</option><option>CABINITE PANGALENGAN</option><option>JASA KOS KAWAN MANSION</option><option>JASA KOS MANDIRI MANSION</option><option>INDONESIA HIJAU DWIDAYA</option></select><select id="reportCategory" class="control" onchange="renderReport()"><option value="">Semua Kategori</option><option>Biaya Transportasi</option><option>Biaya ATK</option><option>Biaya Bangunan</option><option>Biaya Perawatan</option><option>Biaya Marketing</option><option>Biaya Listrik</option><option>Biaya Umum</option><option>Biaya Perjalanan Dinas</option></select></div><div class="grid"><div class="card metric clickable-card" role="button" tabindex="0" onclick="openReportClaims('all')"><div class="label">Total Klaim</div><strong id="reportCount">0</strong><small id="reportAllAmount">Rp 0</small><div class="card-hint">Klik untuk melihat pengajuan ›</div></div><div class="card metric green clickable-card" role="button" tabindex="0" onclick="openReportClaims('paid')"><div class="label">Total Dibayar</div><strong id="reportPaidCount">0</strong><small id="reportPaidAmount">Rp 0</small><div class="card-hint">Klik untuk melihat pengajuan ›</div></div></div><div class="card" style="margin-top:14px"><b>Tren Nominal Reimbursement Bulanan</b><div class="chart-scroll"><div id="reportChart" class="chart month-chart"></div></div><div class="chart-note">Geser grafik ke samping untuk melihat seluruh bulan.</div></div><h2>Laporan Ringkas per Kategori</h2><div id="reportSummary" class="list"></div><div class="report-actions"><button class="secondary" onclick="exportCSV()">▦ Export Excel</button><button class="secondary" onclick="window.print()">▣ Export PDF</button></div></section>
-<section id="reportClaims" class="screen"><div class="header"><button class="back" onclick="go('report')">←</button><h1 id="reportClaimsTitle">Daftar Klaim</h1></div><div class="hero status-summary"><small id="reportClaimsFilter">Filter laporan aktif</small><strong id="reportClaimsTotal">Rp 0</strong><small id="reportClaimsCount">0 pengajuan</small></div><div class="status-toolbar"><input id="reportClaimsSearch" class="control" placeholder="Cari nama, unit, kategori, atau vendor..." oninput="renderReportClaims()"></div><div id="reportClaimsContent" class="list"></div></section><section id="payment" class="screen"><div class="header"><button class="back" onclick="go('finance')">←</button><h1>Pembayaran</h1></div><div class="hero"><div><small>Siap dibayar</small><strong id="paymentTotal" class="payment-total">Rp 0</strong><small id="paymentSelected">0 klaim dipilih</small></div></div><h2>Daftar Klaim Siap Dibayar</h2><div id="paymentList" class="list"></div><div class="form-group" style="margin-top:18px"><label>Metode Pembayaran</label><select id="paymentMethod" class="control"><option>Transfer Bank</option><option>Kas Tunai</option></select></div><div class="form-group"><label>Tanggal Pembayaran</label><input id="paymentDate" type="date" class="control"></div><div class="form-group"><label>Bukti Transfer</label><label class="upload">☁ Upload bukti transfer<input id="paymentProof" type="file" accept="image/*,.pdf" hidden onchange="readPaymentProof(event)"><span id="paymentProofInfo" class="helper proof-info"></span></label></div><button class="primary" onclick="completePayment()">✈ Tandai Sudah Dibayar</button></section><section id="settings" class="screen"><div class="header"><button class="back" onclick="go('home')">←</button><h1>Setting</h1></div><p class="sub">Kelola konfigurasi admin.</p><div id="supabaseConfigCard" class="card" style="margin-bottom:14px"><b>Konfigurasi Supabase</b><div class="helper" style="margin-top:5px">Isi URL project dan ANON KEY agar pengajuan benar-benar tersimpan ke database Supabase.</div><div id="supabaseConnIndicator" class="badge" style="margin-top:10px;display:inline-block">Status: Mengecek...</div><div id="supabaseConnDetail" class="helper" style="margin-top:6px">Memverifikasi sambungan Supabase...</div><div class="form-group" style="margin-top:12px"><label>Supabase Project URL</label><input id="supabaseUrlInput" class="control" placeholder="https://xxxx.supabase.co" oninput="mirrorSupabaseConfigInputs('settings')"></div><div class="form-group"><label>Supabase ANON KEY</label><input id="supabaseAnonKeyInput" class="control" placeholder="eyJ..." oninput="mirrorSupabaseConfigInputs('settings')"></div><div class="item-actions" style="margin-top:0"><button class="secondary" onclick="testSupabaseConnection()">Tes Koneksi</button><button class="secondary" onclick="saveSupabaseConfig()">Simpan Config</button></div></div><div id="unitManagerCard" class="card" style="display:none;margin-bottom:14px"><b>Kelola Unit Bisnis</b><div class="helper" style="margin-top:5px">Tambah, edit, atau hapus unit bisnis.</div><div class="item-actions" style="margin-top:12px"><input id="unitNameInput" class="control" placeholder="Nama unit bisnis"><button class="secondary" onclick="addUnit()">Tambah</button></div><div id="unitManageList" class="list" style="margin-top:10px"></div></div><div id="userManagerCard" class="card" style="display:none;margin-bottom:14px"><b>Kelola User</b><div class="helper" style="margin-top:5px">Admin dapat membuat akun user baru beserta role. Password disimpan dalam bentuk hash, bukan teks asli.</div><div class="form-group" style="margin-top:12px"><label>Nama</label><input id="newUserName" class="control" placeholder="Nama user"></div><div class="form-group"><label>Email</label><input id="newUserEmail" class="control" placeholder="nama@domain.com"></div><div class="form-group"><label>Nomor WhatsApp</label><input id="newUserWhatsapp" inputmode="tel" class="control" placeholder="62812xxxxxxx"></div><div class="form-group"><label>Password</label><input id="newUserPassword" type="password" class="control" placeholder="Password user"></div><div class="form-group"><label>Role</label><select id="newUserRole" class="control"><option value="Karyawan">Karyawan</option><option value="Manager">Manager</option><option value="Finance">Finance</option><option value="Admin">Admin</option></select><small class="helper" style="margin-top:6px;display:block">Nomor WhatsApp dipakai untuk notifikasi approval ke karyawan.</small></div><button class="secondary" style="width:100%" onclick="addUser()">Tambah User</button><div id="userManageList" class="list" style="margin-top:10px"></div></div></section><nav id="bottomNav" class="bottom" style="display:none"><button class="nav active" data-page="home"><span>⌂</span>Beranda</button><button class="nav" data-page="form"><span>▤</span>Pengajuan</button><button class="nav" data-page="approval"><span>✓</span>Approval</button><button class="nav" data-page="finance"><span>♙</span>Finance</button><button class="nav" data-page="report"><span>▥</span>Laporan</button><button id="settingsNav" class="nav" data-page="settings" style="display:none"><span>⚙</span>Setting</button></nav></main></div>
+<section id="reportClaims" class="screen"><div class="header"><button class="back" onclick="go('report')">←</button><h1 id="reportClaimsTitle">Daftar Klaim</h1></div><div class="hero status-summary"><small id="reportClaimsFilter">Filter laporan aktif</small><strong id="reportClaimsTotal">Rp 0</strong><small id="reportClaimsCount">0 pengajuan</small></div><div class="status-toolbar"><input id="reportClaimsSearch" class="control" placeholder="Cari nama, unit, kategori, atau vendor..." oninput="renderReportClaims()"></div><div id="reportClaimsContent" class="list"></div></section><section id="payment" class="screen"><div class="header"><button class="back" onclick="go('finance')">←</button><h1>Pembayaran</h1></div><div class="hero"><div><small>Siap dibayar</small><strong id="paymentTotal" class="payment-total">Rp 0</strong><small id="paymentSelected">0 klaim dipilih</small></div></div><h2>Daftar Klaim Siap Dibayar</h2><div id="paymentList" class="list"></div><div class="form-group" style="margin-top:18px"><label>Metode Pembayaran</label><select id="paymentMethod" class="control"><option>Transfer Bank</option><option>Kas Tunai</option></select></div><div class="form-group"><label>Tanggal Pembayaran</label><input id="paymentDate" type="date" class="control"></div><div class="form-group"><label>Bukti Transfer</label><label class="upload">☁ Upload bukti transfer<input id="paymentProof" type="file" accept="image/*,.pdf" hidden onchange="readPaymentProof(event)"><span id="paymentProofInfo" class="helper proof-info"></span></label></div><button class="primary" onclick="completePayment()">✈ Tandai Sudah Dibayar</button></section><section id="settings" class="screen"><div class="header"><button class="back" onclick="go('home')">←</button><h1>Setting</h1></div><p class="sub">Kelola konfigurasi admin.</p><div id="supabaseConfigCard" class="card" style="margin-bottom:14px"><b>Konfigurasi Supabase</b><div class="helper" style="margin-top:5px">Isi URL project dan ANON KEY agar pengajuan benar-benar tersimpan ke database Supabase.</div><div id="supabaseConnIndicator" class="badge" style="margin-top:10px;display:inline-block">Status: Mengecek...</div><div id="supabaseConnDetail" class="helper" style="margin-top:6px">Memverifikasi sambungan Supabase...</div><div class="form-group" style="margin-top:12px"><label>Supabase Project URL</label><input id="supabaseUrlInput" class="control" placeholder="https://xxxx.supabase.co" oninput="mirrorSupabaseConfigInputs('settings')"></div><div class="form-group"><label>Supabase ANON KEY</label><input id="supabaseAnonKeyInput" class="control" placeholder="eyJ..." oninput="mirrorSupabaseConfigInputs('settings')"></div><div class="item-actions" style="margin-top:0"><button class="secondary" onclick="testSupabaseConnection()">Tes Koneksi</button><button class="secondary" onclick="saveSupabaseConfig()">Simpan Config</button></div></div><div id="unitManagerCard" class="card" style="display:none;margin-bottom:14px"><b>Kelola Unit Bisnis</b><div class="helper" style="margin-top:5px">Tambah, edit, atau hapus unit bisnis.</div><div class="item-actions" style="margin-top:12px"><input id="unitNameInput" class="control" placeholder="Nama unit bisnis"><button class="secondary" onclick="addUnit()">Tambah</button></div><div id="unitManageList" class="list" style="margin-top:10px"></div></div><div id="userManagerCard" class="card" style="display:none;margin-bottom:14px"><b>Kelola User</b><div class="helper" style="margin-top:5px">Admin dapat membuat akun user baru beserta role. Password lokal tetap di-hash untuk fallback offline, sedangkan akun server dibuat lewat Supabase Auth.</div><div class="form-group" style="margin-top:12px"><label>Nama</label><input id="newUserName" class="control" placeholder="Nama user"></div><div class="form-group"><label>Email</label><input id="newUserEmail" class="control" placeholder="nama@domain.com"></div><div class="form-group"><label>Nomor WhatsApp</label><input id="newUserWhatsapp" inputmode="tel" class="control" placeholder="62812xxxxxxx"></div><div class="form-group"><label>Password</label><input id="newUserPassword" type="password" class="control" placeholder="Password user"></div><div class="form-group"><label>Role</label><select id="newUserRole" class="control"><option value="Karyawan">Karyawan</option><option value="Manager">Manager</option><option value="Finance">Finance</option><option value="Admin">Admin</option></select><small class="helper" style="margin-top:6px;display:block">Nomor WhatsApp dipakai untuk notifikasi approval ke karyawan.</small></div><button class="secondary" style="width:100%" onclick="addUser()">Tambah User</button><div id="userManageList" class="list" style="margin-top:10px"></div></div></section><nav id="bottomNav" class="bottom" style="display:none"><button class="nav active" data-page="home"><span>⌂</span>Beranda</button><button class="nav" data-page="form"><span>▤</span>Pengajuan</button><button class="nav" data-page="approval"><span>✓</span>Approval</button><button class="nav" data-page="finance"><span>♙</span>Finance</button><button class="nav" data-page="report"><span>▥</span>Laporan</button><button id="settingsNav" class="nav" data-page="settings" style="display:none"><span>⚙</span>Setting</button></nav></main></div>
 <script src="./runtime-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const DEFAULT_USERS = [{
-    name: 'Azahra Shila',
-    email: 'azahra@bambulogyindonesia.com',
-    password: 'pbkdf2$120000$1f3c6c284f0e1f50e641e6c0f1f4b257$ef4297223ee490fdfc70873dc1dcea23fcbcd5a4636025f3ee720c1fcc9f15d9',
-    role: 'Admin'
-  }, {
-    name: 'Finance Bambulogy',
-    email: 'finance@bambulogyindonesia.com',
-    password: 'pbkdf2$120000$2cf4f366329b0bb6f0f0ef0e30278d3d$772fa4ee428d6cf066a7514f4ca20e4ac1568f6e4a56a2ee53bb8a969dd24211',
-    role: 'Finance'
-  }, {
-    name: 'Manager Bambulogy',
-    email: 'manager@bambulogyindonesia.com',
-    password: 'pbkdf2$120000$5cc495d31be53a2480a1dc3e09922895$63b344309f8b473e9cdae31b4b85964f94f95a875e20987207f89a04554b2503',
-    role: 'Manager'
-  }, {
-    name: 'Ilham Devitra',
-    email: 'karyawan@bambulogyindonesia.com',
-    password: 'pbkdf2$120000$2dd42f96c46c721fe8b47115834ccfec$5cafe140bc2702e7766cd81acebd2dc1b07ed2d0b51e57b511a6314dfda79e5a',
-    role: 'Karyawan'
-  }, {
-    name: 'Dima Alam',
-    email: 'dima.lestardi@bambulogyindonesia.com',
-    password: 'pbkdf2$120000$2f8c8eeea0f677f62526ce46d42d4f46$2346c6cae7bfdab3845b07c9139f09bf97bfa4367ae4128ac3d402e1a7db95e1',
-    role: 'Karyawan'
-  }, {
-    name: 'Ferry Sanjaya',
-    email: 'ferry.sanjaya@bambulogyindonesia.com',
-    password: 'pbkdf2$120000$d8aa5587c1093d62f485e7da4d70c3cd$fdae90391f6e87f4407e6274451da96601d0577b1eb40f92e4c9aa0924e88aed',
-    role: 'Karyawan'
-  }],
-  KEY = 'reimburseBambulogyPaymentProofV11',
+const KEY = 'reimburseBambulogyPaymentProofV11',
   UNIT_KEY = 'reimburseBambulogyUnitsV1',
   USER_KEY = 'reimburseBambulogyUsersV1',
   REMEMBER_LOGIN_KEY = 'reimburseBambulogyRememberLoginV1',
@@ -409,9 +378,7 @@ let currentUser = null,
 let units = JSON.parse(localStorage.getItem(UNIT_KEY) || 'null');
 if (!Array.isArray(units) || !units.length) units = [...DEFAULT_UNITS];
 let users = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
-if (!Array.isArray(users) || !users.length) users = DEFAULT_USERS.map(user => normalizeUserRecord({
-  ...user
-}));
+if (!Array.isArray(users)) users = [];
 users = users.map(normalizeUserRecord);
 const sample = [];
 let claims = JSON.parse(localStorage.getItem(KEY) || 'null');
@@ -458,7 +425,8 @@ const PASSWORD_DIGEST_ITERATIONS = 120000,
 const sanitizeSessionUser = user => user ? {
     name: user.name || '',
     email: normalizeEmail(user.email || ''),
-    role: user.role || 'Karyawan'
+    role: user.role || 'Karyawan',
+    authUserId: String(user.authUserId || user.auth_user_id || '').trim()
   } : null,
   toHex = buffer => Array.from(new Uint8Array(buffer), byte => byte.toString(16).padStart(2, '0')).join('');
 
@@ -758,44 +726,75 @@ async function login() {
     password = (el('password')?.value || '');
   const remember = !!el('rememberLogin')?.checked;
   if (!email || !password) return notify('Masukkan email dan password');
-  let attemptedRemoteLoad = false;
-  if (canUseSupabase() && (!users.length || !users.some(x => x.email === email))) attemptedRemoteLoad = await refreshUsersFromSupabase();
+  if (canUseSupabaseAuth() && navigator.onLine) try {
+    ensureSupabaseClient();
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+    if (error) throw error;
+    const activeUser = await syncUserFromSupabaseAuth(data?.user || data?.session?.user, false);
+    await finalizeSuccessfulLogin(activeUser, remember, password);
+    updateAuthEmptyState();
+    return
+  } catch (error) {
+    console.error('Login Supabase gagal:', error);
+    const localUser = await verifyLocalUserCredentials(email, password).catch(localError => {
+      throw new Error(localError?.message || 'Validasi password gagal')
+    });
+    if (localUser) {
+      if (!navigator.onLine || isSupabaseNetworkError(error)) {
+        await finalizeSuccessfulLogin(localUser, remember, password);
+        return notify('Masuk memakai cache lokal karena Supabase sedang offline')
+      }
+      try {
+        const signUpData = await createSupabaseAuthAccount(localUser, password, false);
+        if (signUpData?.session?.user || signUpData?.user) {
+          const activeUser = await syncUserFromSupabaseAuth(signUpData.session?.user || signUpData.user, true);
+          await finalizeSuccessfulLogin(activeUser, remember, password);
+          return notify('Akun lokal berhasil dimigrasikan ke Supabase')
+        }
+      } catch (migrationError) {
+        console.error('Migrasi user lokal ke Supabase gagal:', migrationError);
+        if (formatSupabaseAuthError(migrationError).includes('sudah terdaftar')) return notify('Email sudah terdaftar di Supabase. Gunakan password akun Supabase terbaru.');
+        if (!isSupabaseNetworkError(migrationError)) return notify(formatSupabaseAuthError(migrationError))
+      }
+    }
+    updateAuthEmptyState();
+    return notify(formatSupabaseAuthError(error))
+  }
   if (!users.length) return notify(canUseSupabase() ? 'Data akun belum siap. Coba lagi sebentar.' : 'Akun di device ini belum termuat. Isi config Supabase lalu klik Muat Akun Server.');
-  const user = users.find(x => x.email === email);
+  const user = await verifyLocalUserCredentials(email, password).catch(error => {
+    throw new Error(error?.message || 'Validasi password gagal')
+  });
   if (!user) {
     updateAuthEmptyState();
-    if (!canUseSupabase()) return notify('Akun belum termuat di device ini. Isi config Supabase lalu klik Muat Akun Server');
-    if (attemptedRemoteLoad && !supabaseReady) return notify('Akun server belum berhasil dimuat. Cek koneksi Supabase lalu coba lagi');
     return notify('Email atau password salah')
   }
-  let passwordValid = false;
-  try {
-    passwordValid = await verifyStoredPassword(user.password || '', password)
-  } catch (error) {
-    return notify(error?.message || 'Validasi password gagal')
-  }
-  if (!passwordValid) return notify('Email atau password salah');
-  if (typeof user.password === 'string' && !isPasswordDigest(user.password)) try {
-    user.password = await createPasswordDigest(password);
-    saveUsers();
-    if (supabaseReady) await syncAllStateToSupabase()
-  } catch (error) {
-    console.error('Upgrade password gagal:', error)
-  }
-  setCurrentUser(user);
-  if (remember) localStorage.setItem(REMEMBER_LOGIN_KEY, email);
-  else localStorage.removeItem(REMEMBER_LOGIN_KEY);
-  updateGreeting();
-  go('home')
+  await finalizeSuccessfulLogin(user, remember, password)
 }
 
-function logout() {
+async function logout() {
+  isLoggingOut = true;
   localStorage.removeItem(REMEMBER_LOGIN_KEY);
+  if (canUseSupabaseAuth()) try {
+    ensureSupabaseClient();
+    const {
+      error
+    } = await supabaseClient.auth.signOut();
+    if (error) throw error
+  } catch (error) {
+    console.error('Logout Supabase gagal:', error)
+  }
   setCurrentUser(null);
   if (el('rememberLogin')) el('rememberLogin').checked = false;
   el('password').value = '';
   updateAuthEmptyState();
-  go('login')
+  go('login');
+  isLoggingOut = false
 }
 
 function isAdmin() {
@@ -857,20 +856,276 @@ function normalizeUserRecord(user) {
     email: '',
     password: '',
     role: 'Karyawan',
-    whatsappNumber: ''
+    whatsappNumber: '',
+    authUserId: ''
   };
   return {
     ...user,
     name: String(user.name || '').trim(),
     email: normalizeEmail(user.email || ''),
     role: user.role || 'Karyawan',
-    whatsappNumber: normalizeWhatsAppNumber(user.whatsappNumber || user.whatsapp_number || '')
+    whatsappNumber: normalizeWhatsAppNumber(user.whatsappNumber || user.whatsapp_number || ''),
+    authUserId: String(user.authUserId || user.auth_user_id || '').trim()
   }
 }
 
 function findUserByEmail(email) {
   const normalized = normalizeEmail(email || '');
   return users.find(user => normalizeEmail(user.email || '') === normalized) || null
+}
+
+function upsertLocalUser(user) {
+  const normalized = normalizeUserRecord(user);
+  if (!normalized.email) return null;
+  const idx = users.findIndex(item => normalizeEmail(item.email || '') === normalized.email);
+  if (idx >= 0) users[idx] = normalizeUserRecord({
+    ...users[idx],
+    ...normalized
+  });
+  else users.push(normalized);
+  saveUsers();
+  return users[idx >= 0 ? idx : users.length - 1]
+}
+
+function normalizeSupabaseRole(value, fallback = 'Karyawan') {
+  const role = String(value || fallback || 'Karyawan').trim();
+  return ['Admin', 'Finance', 'Manager', 'Karyawan'].includes(role) ? role : fallback
+}
+
+function buildUserFromAuth(authUser, fallback = {}) {
+  const metadata = authUser?.user_metadata || {};
+  return normalizeUserRecord({
+    ...fallback,
+    authUserId: authUser?.id || fallback.authUserId || '',
+    email: normalizeEmail(authUser?.email || fallback.email || ''),
+    name: String(metadata.name || fallback.name || authUser?.email?.split('@')[0] || '').trim(),
+    role: normalizeSupabaseRole(metadata.role, fallback.role || 'Karyawan'),
+    whatsappNumber: metadata.whatsapp_number || metadata.whatsappNumber || fallback.whatsappNumber || ''
+  })
+}
+
+async function selectSupabaseUserRows(queryBuilder) {
+  let lastError = null;
+  for (const columns of [USER_LIST_COLUMNS_AUTH, USER_LIST_COLUMNS, USER_LIST_COLUMNS_LEGACY]) {
+    const result = await queryBuilder(columns);
+    if (!result?.error) return result;
+    if (!isSupabaseMissingColumnError(result.error)) throw result.error;
+    lastError = result.error
+  }
+  if (lastError) throw lastError;
+  return {
+    data: [],
+    error: null
+  }
+}
+
+async function fetchSupabaseUserProfile({
+  authUserId = '',
+  email = ''
+} = {}) {
+  if (!canUseSupabase()) return null;
+  ensureSupabaseClient();
+  const normalizedEmail = normalizeEmail(email || '');
+  if (authUserId) try {
+    const response = await selectSupabaseUserRows(columns => supabaseClient.from(SUPABASE_USERS_TABLE).select(columns).eq('auth_user_id', authUserId).limit(1));
+    if (Array.isArray(response?.data) && response.data.length) return dbToUser(response.data[0])
+  } catch (error) {
+    if (!isSupabaseMissingColumnError(error)) throw error
+  }
+  if (!normalizedEmail) return null;
+  const response = await selectSupabaseUserRows(columns => supabaseClient.from(SUPABASE_USERS_TABLE).select(columns).eq('email', normalizedEmail).limit(1));
+  return Array.isArray(response?.data) && response.data.length ? dbToUser(response.data[0]) : null
+}
+
+function rememberLoginEmail(email, remember) {
+  if (remember) localStorage.setItem(REMEMBER_LOGIN_KEY, normalizeEmail(email || ''));
+  else localStorage.removeItem(REMEMBER_LOGIN_KEY)
+}
+
+async function storeOfflinePassword(user, password) {
+  if (!user?.email || !password) return normalizeUserRecord(user);
+  try {
+    return upsertLocalUser({
+      ...user,
+      password: await createPasswordDigest(password)
+    }) || normalizeUserRecord(user)
+  } catch (error) {
+    console.error('Cache password offline gagal:', error);
+    return normalizeUserRecord(user)
+  }
+}
+
+async function finalizeSuccessfulLogin(user, remember, password) {
+  let activeUser = normalizeUserRecord(user);
+  if (password) activeUser = await storeOfflinePassword(activeUser, password);
+  setCurrentUser(activeUser);
+  rememberLoginEmail(activeUser.email, remember);
+  updateGreeting();
+  go('home');
+  return activeUser
+}
+
+async function verifyLocalUserCredentials(email, password) {
+  const user = findUserByEmail(email);
+  if (!user) return null;
+  if (!await verifyStoredPassword(user.password || '', password)) return null;
+  return normalizeUserRecord(user)
+}
+
+function formatSupabaseAuthError(error, fallback = 'Autentikasi Supabase gagal') {
+  const raw = String(error?.message || error?.error_description || error?.error || '').trim(),
+    msg = raw.toLowerCase();
+  if (!msg) return fallback;
+  if (msg.includes('invalid login credentials')) return 'Email atau password salah';
+  if (msg.includes('email not confirmed')) return 'Email belum dikonfirmasi di Supabase';
+  if (msg.includes('user already registered')) return 'Email sudah terdaftar di Supabase';
+  if (msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch')) return 'Koneksi ke Supabase gagal';
+  return raw
+}
+
+function isSupabaseNetworkError(error) {
+  const msg = String(error?.message || error?.error_description || error?.error || '').toLowerCase();
+  return msg.includes('failed to fetch') || msg.includes('network') || msg.includes('fetch')
+}
+
+function canUseSupabaseAuth() {
+  return canUseSupabase() && typeof window.supabase?.createClient === 'function'
+}
+
+async function getSupabaseSession() {
+  if (!canUseSupabaseAuth()) return null;
+  ensureSupabaseClient();
+  const {
+    data,
+    error
+  } = await supabaseClient.auth.getSession();
+  if (error) throw error;
+  return data?.session || null
+}
+
+async function restoreSupabaseSession(session) {
+  if (!canUseSupabaseAuth() || !session?.access_token || !session?.refresh_token) return null;
+  ensureSupabaseClient();
+  const {
+    error
+  } = await supabaseClient.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token
+  });
+  if (error) throw error;
+  return true
+}
+
+async function upsertSupabaseUserProfile(user) {
+  if (!canUseSupabase()) return false;
+  ensureSupabaseClient();
+  let result = await supabaseClient.from(SUPABASE_USERS_TABLE).upsert([userToDb(user)], {
+    onConflict: 'email'
+  });
+  if (result?.error && isSupabaseMissingColumnError(result.error)) result = await supabaseClient.from(SUPABASE_USERS_TABLE).upsert([userToDbLegacy(user)], {
+    onConflict: 'email'
+  });
+  if (result?.error) throw result.error;
+  return true
+}
+
+async function syncUserFromSupabaseAuth(authUser, allowProfileCreation = false) {
+  if (!authUser?.email) throw new Error('Session Supabase tidak memiliki email');
+  const localUser = findUserByEmail(authUser.email || '');
+  let profile = await fetchSupabaseUserProfile({
+    authUserId: authUser.id || '',
+    email: authUser.email || ''
+  });
+  if (!profile && (allowProfileCreation || localUser)) {
+    const draftProfile = buildUserFromAuth(authUser, localUser || {});
+    await upsertSupabaseUserProfile(draftProfile);
+    profile = await fetchSupabaseUserProfile({
+      authUserId: authUser.id || '',
+      email: authUser.email || ''
+    }) || draftProfile
+  }
+  if (!profile && localUser) profile = buildUserFromAuth(authUser, localUser);
+  if (!profile) throw new Error('Akun berhasil login ke Supabase, tetapi profil user aplikasi belum terdaftar');
+  profile = buildUserFromAuth(authUser, profile);
+  profile = upsertLocalUser(profile) || profile;
+  setCurrentUser(profile);
+  updateGreeting();
+  return profile
+}
+
+async function createSupabaseAuthAccount(user, password, preserveCurrentSession = false) {
+  if (!canUseSupabaseAuth()) throw new Error('Supabase Auth belum tersedia');
+  ensureSupabaseClient();
+  const previousSession = preserveCurrentSession ? await getSupabaseSession().catch(() => null) : null,
+    payload = {
+      email: normalizeEmail(user.email || ''),
+      password,
+      options: {
+        data: {
+          name: user.name || '',
+          role: normalizeSupabaseRole(user.role, 'Karyawan'),
+          whatsapp_number: user.whatsappNumber || ''
+        }
+      }
+    },
+    {
+      data,
+      error
+    } = await supabaseClient.auth.signUp(payload);
+  if (error) throw error;
+  let syncedUser = null;
+  if (data?.user) {
+    syncedUser = buildUserFromAuth(data.user, user);
+    upsertLocalUser({
+      ...syncedUser,
+      password: user.password || ''
+    });
+    try {
+      await upsertSupabaseUserProfile(syncedUser)
+    } catch (profileError) {
+      console.error('Sinkronisasi profil setelah signUp gagal:', profileError)
+    }
+  }
+  if (previousSession) try {
+    await restoreSupabaseSession(previousSession)
+  } catch (restoreError) {
+    console.error('Pemulihan sesi admin gagal:', restoreError)
+  }
+  return {
+    ...data,
+    syncedUser
+  }
+}
+
+let supabaseAuthSubscription = null,
+  isLoggingOut = false;
+
+function registerSupabaseAuthListener() {
+  if (!canUseSupabaseAuth()) return;
+  ensureSupabaseClient();
+  if (supabaseAuthSubscription) return;
+  const {
+    data
+  } = supabaseClient.auth.onAuthStateChange((event, session) => {
+    Promise.resolve().then(async () => {
+      if (event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        if (el('password')) el('password').value = '';
+        updateAuthEmptyState();
+        if (!isLoggingOut) go('login');
+        return
+      }
+      if (!session?.user) return;
+      try {
+        await syncUserFromSupabaseAuth(session.user, !!findUserByEmail(session.user.email || ''));
+        updateAuthEmptyState();
+        if (el('login')?.classList.contains('active')) go('home')
+      } catch (error) {
+        console.error('Auth state change gagal disinkronkan:', error)
+      }
+    })
+  });
+  supabaseAuthSubscription = data?.subscription || null
 }
 
 function getClaimOwnerUser(claim) {
@@ -1598,14 +1853,21 @@ async function addUser() {
   } catch (error) {
     return notify(error?.message || 'Gagal mengamankan password user')
   }
-  users.push(normalizeUserRecord({
+  const newUser = normalizeUserRecord({
     name,
     email,
     whatsappNumber,
     password: hashedPassword,
     role
-  }));
-  saveUsers();
+  });
+  if (canUseSupabaseAuth() && navigator.onLine) try {
+    await createSupabaseAuthAccount(newUser, password, true)
+  } catch (error) {
+    console.error('Pembuatan akun Supabase untuk user baru gagal:', error);
+    const message = formatSupabaseAuthError(error);
+    if (!message.includes('sudah terdaftar') && !isSupabaseNetworkError(error)) return notify(message)
+  }
+  upsertLocalUser(newUser);
   if (el('newUserName')) el('newUserName').value = '';
   if (el('newUserEmail')) el('newUserEmail').value = '';
   if (el('newUserWhatsapp')) el('newUserWhatsapp').value = '';
@@ -1613,7 +1875,7 @@ async function addUser() {
   if (el('newUserRole')) el('newUserRole').value = 'Karyawan';
   updateAuthEmptyState();
   renderUserManager();
-  notify('User baru berhasil ditambahkan')
+  notify(canUseSupabaseAuth() && navigator.onLine ? 'User baru berhasil ditambahkan dan akun Supabase dibuat' : 'User baru berhasil ditambahkan')
 }
 async function editUser(encodedEmail) {
   if (!canManageUser()) return;
@@ -1645,6 +1907,9 @@ async function editUser(encodedEmail) {
   const passwordInput = window.prompt('Password baru (kosongkan jika tidak diubah)', '');
   if (passwordInput === null) return;
   const nextSecret = (passwordInput || '').trim();
+  const editingSelf = currentUser && normalizeEmail(currentUser.email || '') === currentEmail;
+  if (canUseSupabaseAuth() && !editingSelf && email !== currentEmail) return notify('Email user lain harus diubah langsung oleh pengguna lewat akun Supabase masing-masing');
+  if (canUseSupabaseAuth() && !editingSelf && nextSecret) return notify('Password user lain harus diubah langsung oleh pengguna lewat akun Supabase masing-masing');
   let hashedPassword = target.password || '';
   if (nextSecret) {
     if (nextSecret.length < 8) return notify('Password minimal 8 karakter');
@@ -1662,6 +1927,26 @@ async function editUser(encodedEmail) {
     password: hashedPassword,
     role
   });
+  if (editingSelf && canUseSupabaseAuth()) try {
+    ensureSupabaseClient();
+    const authUpdates = {
+      data: {
+        name,
+        role,
+        whatsapp_number: whatsappNumber || ''
+      }
+    };
+    if (email !== currentEmail) authUpdates.email = email;
+    if (nextSecret) authUpdates.password = nextSecret;
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.updateUser(authUpdates);
+    if (error) throw error;
+    if (data?.user) updatedUser.authUserId = data.user.id || updatedUser.authUserId || ''
+  } catch (error) {
+    return notify(formatSupabaseAuthError(error, 'Update akun Supabase gagal'))
+  }
   users[idx] = updatedUser;
   let claimOwnershipChanged = false;
   claims.forEach(claim => {
@@ -1696,21 +1981,34 @@ async function createFirstAdmin() {
   } catch (error) {
     return notify(error?.message || 'Gagal membuat admin pertama')
   }
-  users = [{
+  const adminUser = normalizeUserRecord({
     name,
     email,
     password: hashedPassword,
     role: 'Admin'
-  }];
+  });
+  let syncedAdminUser = null;
+  if (canUseSupabaseAuth() && navigator.onLine) try {
+    const data = await createSupabaseAuthAccount(adminUser, password, false);
+    syncedAdminUser = data?.syncedUser || null;
+    if (!data?.session?.user && !data?.user) return notify('Akun admin dibuat di Supabase, tetapi menunggu konfirmasi email')
+  } catch (error) {
+    console.error('Pembuatan admin Supabase gagal:', error);
+    const message = formatSupabaseAuthError(error);
+    if (message.includes('sudah terdaftar')) return notify('Email admin sudah terdaftar di Supabase. Silakan login langsung dengan akun tersebut.');
+    if (!isSupabaseNetworkError(error)) return notify(message)
+  }
+  users = [normalizeUserRecord({
+    ...adminUser,
+    ...syncedAdminUser,
+    password: hashedPassword
+  })];
   saveUsers();
   updateAuthEmptyState();
   renderUserManager();
   notify('Admin pertama berhasil dibuat');
   if (el('rememberLogin')) el('rememberLogin').checked = true;
-  localStorage.setItem(REMEMBER_LOGIN_KEY, email);
-  setCurrentUser(users[0]);
-  updateGreeting();
-  go('home')
+  await finalizeSuccessfulLogin(users[0], true, password)
 }
 
 function editUnit(encodedUnit) {
@@ -2024,6 +2322,17 @@ async function initializeAuth() {
   const rememberedEmail = normalizeEmail(localStorage.getItem(REMEMBER_LOGIN_KEY) || '');
   if (el('rememberLogin')) el('rememberLogin').checked = !!rememberedEmail;
   if (rememberedEmail && el('email')) el('email').value = rememberedEmail;
+  if (canUseSupabaseAuth()) try {
+    registerSupabaseAuthListener();
+    const session = await getSupabaseSession();
+    if (session?.user) {
+      await syncUserFromSupabaseAuth(session.user, !!findUserByEmail(session.user.email || ''));
+      go('home');
+      return
+    }
+  } catch (error) {
+    console.error('Pemulihan sesi Supabase gagal:', error)
+  }
   const saved = sessionStorage.getItem('rpUser');
   if (saved) try {
     const parsed = JSON.parse(saved),
@@ -2656,11 +2965,12 @@ exportCSV = function() {
 renderTravelExpenseRows([]);
 toggleTravelFields();
 
-const RAW_SUPABASE_URL = (window.SUPABASE_URL || localStorage.getItem('rpSupabaseUrl') || 'https://YOUR-PROJECT-REF.supabase.co').trim(),
-  RAW_SUPABASE_ANON_KEY = (window.SUPABASE_ANON_KEY || localStorage.getItem('rpSupabaseAnonKey') || 'YOUR_SUPABASE_ANON_KEY').trim(),
+const RAW_SUPABASE_URL = (window.RUNTIME_CONFIG?.SUPABASE_URL || window.SUPABASE_URL || localStorage.getItem('rpSupabaseUrl') || 'https://YOUR-PROJECT-REF.supabase.co').trim(),
+  RAW_SUPABASE_ANON_KEY = (window.RUNTIME_CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || localStorage.getItem('rpSupabaseAnonKey') || 'YOUR_SUPABASE_ANON_KEY').trim(),
   SUPABASE_UNITS_TABLE = 'reimbursement_units',
   SUPABASE_USERS_TABLE = 'reimbursement_users',
   SUPABASE_CLAIMS_TABLE = 'reimbursement_claims',
+  USER_LIST_COLUMNS_AUTH = 'auth_user_id,name,email,password,role,whatsapp_number',
   USER_LIST_COLUMNS = 'name,email,password,role,whatsapp_number',
   USER_LIST_COLUMNS_LEGACY = 'name,email,password,role',
   CLAIM_LIST_COLUMNS = 'id,employee,owner_email,unit,category,date,amount,vendor,description,travel_detail,travel_expense_items,bank,account_number,account_name,status,created_at,updated_at,approved_at,verified_at,paid_at,payment_method,created_by_email,updated_by_email,approved_by_email,verified_by_email,paid_by_email,deleted_at,deleted_by_email,odoo_bill_id,odoo_bill_name,odoo_synced_at,odoo_sync_error',
@@ -2837,7 +3147,13 @@ function updateSupabaseConnectionIndicator() {
 
 function ensureSupabaseClient() {
   if (supabaseClient) return supabaseClient;
-  supabaseClient = window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : createSupabaseRestClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  supabaseClient = window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }) : createSupabaseRestClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   return supabaseClient
 }
 
@@ -3087,9 +3403,10 @@ function showSupabaseError(msg) {
 function userToDb(user) {
   const normalized = normalizeUserRecord(user);
   return {
+    auth_user_id: normalized.authUserId || null,
     name: normalized.name || '',
     email: normalized.email || '',
-    password: normalized.password || '',
+    password: normalized.password || null,
     role: normalized.role || 'Karyawan',
     whatsapp_number: normalized.whatsappNumber || null
   }
@@ -3107,6 +3424,7 @@ function userToDbLegacy(user) {
 
 function dbToUser(row) {
   return normalizeUserRecord({
+    authUserId: row.auth_user_id || '',
     name: row.name || '',
     email: row.email || '',
     password: row.password || '',
@@ -3522,15 +3840,9 @@ async function hydrateStateFromSupabase() {
     ({
       data: remoteUsers,
       error: usersError
-    } = await supabaseClient.from(SUPABASE_USERS_TABLE).select(USER_LIST_COLUMNS).order('name', {
+    } = await selectSupabaseUserRows(columns => supabaseClient.from(SUPABASE_USERS_TABLE).select(columns).order('name', {
       ascending: true
-    }));
-    if (usersError && isSupabaseMissingColumnError(usersError))({
-      data: remoteUsers,
-      error: usersError
-    } = await supabaseClient.from(SUPABASE_USERS_TABLE).select(USER_LIST_COLUMNS_LEGACY).order('name', {
-      ascending: true
-    }));
+    })));
     if (unitsError) throw unitsError;
     if (usersError) throw usersError;
     if (claimsError) throw claimsError;
