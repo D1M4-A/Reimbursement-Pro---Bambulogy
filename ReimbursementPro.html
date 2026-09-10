@@ -958,6 +958,21 @@ async function selectSupabaseUserRows(queryBuilder) {
   }
 }
 
+async function selectSupabaseClaimRows(queryBuilder) {
+  let lastError = null;
+  for (const columns of [CLAIM_LIST_COLUMNS, CLAIM_LIST_COLUMNS_LEGACY]) {
+    const result = await queryBuilder(columns);
+    if (!result?.error) return result;
+    if (!isSupabaseMissingColumnError(result.error)) throw result.error;
+    lastError = result.error
+  }
+  if (lastError) throw lastError;
+  return {
+    data: [],
+    error: null
+  }
+}
+
 async function fetchSupabaseUserProfile({
   authUserId = '',
   email = ''
@@ -3051,6 +3066,7 @@ const RAW_SUPABASE_URL = (window.RUNTIME_CONFIG?.SUPABASE_URL || window.SUPABASE
   USER_LIST_COLUMNS = 'name,email,password,role,whatsapp_number',
   USER_LIST_COLUMNS_LEGACY = 'name,email,password,role',
   CLAIM_LIST_COLUMNS = 'id,employee,owner_email,unit,category,date,amount,vendor,description,travel_detail,travel_expense_items,bank,account_number,account_name,status,created_at,updated_at,approved_at,verified_at,paid_at,payment_method,created_by_email,updated_by_email,approved_by_email,verified_by_email,paid_by_email,deleted_at,deleted_by_email,odoo_bill_id,odoo_bill_name,odoo_synced_at,odoo_sync_error',
+  CLAIM_LIST_COLUMNS_LEGACY = 'id,employee,unit,category,date,amount,vendor,description,bank,account_number,account_name,status,created_at,approved_at,verified_at,paid_at,payment_method,receipt,payment_proof',
   ODOO_URL = (window.ODOO_URL || localStorage.getItem('rpOdooUrl') || 'https://YOUR-ODOO-URL').trim(),
   ODOO_DB = (window.ODOO_DB || localStorage.getItem('rpOdooDb') || 'YOUR_ODOO_DB').trim(),
   ODOO_LOGIN = (window.ODOO_LOGIN || localStorage.getItem('rpOdooLogin') || 'YOUR_ODOO_LOGIN').trim(),
@@ -3068,6 +3084,8 @@ let supabaseClient = null,
   supabaseReady = false,
   supabaseSyncInProgress = false,
   supabaseErrorShown = false;
+let claimRefreshInProgress = false,
+  lastClaimRefreshAt = 0;
 const PENDING_CLAIM_SYNC_KEY = 'rpPendingClaimSyncIds';
 let pendingClaimSyncIds = new Set((() => {
     try {
@@ -3080,7 +3098,8 @@ let pendingClaimSyncIds = new Set((() => {
   pendingClaimSyncTimer = null,
   pendingClaimSyncInProgress = false;
 const SUPABASE_STANDBY_HEALTH_MS = 20000,
-  SUPABASE_RECONNECT_DELAY_MS = 5000;
+  SUPABASE_RECONNECT_DELAY_MS = 5000,
+  CLAIM_REFRESH_INTERVAL_MS = 15000;
 let supabaseReconnectTimer = null,
   supabaseStandbyTimer = null,
   supabaseStandbyCheckInProgress = false;
@@ -3245,7 +3264,8 @@ function scheduleSupabaseReconnect(delay = SUPABASE_RECONNECT_DELAY_MS) {
 function startSupabaseStandbyMonitor() {
   if (supabaseStandbyTimer) return;
   supabaseStandbyTimer = setInterval(() => {
-    ensureSupabaseStandby(pendingClaimSyncIds.size > 0)
+    ensureSupabaseStandby(pendingClaimSyncIds.size > 0);
+    refreshClaimsFromSupabase()
   }, SUPABASE_STANDBY_HEALTH_MS)
 }
 
@@ -3909,9 +3929,9 @@ async function hydrateStateFromSupabase() {
       error: claimsError
     }] = await Promise.all([supabaseClient.from(SUPABASE_UNITS_TABLE).select('name').order('name', {
       ascending: true
-    }), supabaseClient.from(SUPABASE_CLAIMS_TABLE).select(CLAIM_LIST_COLUMNS).order('created_at', {
+    }), selectSupabaseClaimRows(columns => supabaseClient.from(SUPABASE_CLAIMS_TABLE).select(columns).order('created_at', {
       ascending: false
-    })]);
+    }))]);
     let remoteUsers = [],
       usersError = null;
     ({
@@ -3936,7 +3956,7 @@ async function hydrateStateFromSupabase() {
       });
       users = Array.from(mergedUsersByEmail.values())
     }
-    if (Array.isArray(remoteClaims) && remoteClaims.length) claims = remoteClaims.map(dbToClaim);
+    if (Array.isArray(remoteClaims)) claims = mergeClaimsWithRemote(remoteClaims);
     ensureClaimOwnership();
     save();
     saveUnits();
@@ -3968,13 +3988,89 @@ async function hydrateStateFromSupabase() {
     updateSupabaseConnectionIndicator()
   }
 }
+
+function sortClaimsNewestFirst(a, b) {
+  return String(b?.createdAt || '').localeCompare(String(a?.createdAt || '')) || String(b?.updatedAt || '').localeCompare(String(a?.updatedAt || '')) || String(b?.id || '').localeCompare(String(a?.id || ''))
+}
+
+function mergeClaimsWithRemote(remoteRows) {
+  const merged = new Map();
+  (Array.isArray(remoteRows) ? remoteRows : []).map(dbToClaim).forEach(claim => {
+    if (claim?.id) merged.set(claim.id, claim)
+  });
+  (Array.isArray(claims) ? claims : []).forEach(claim => {
+    if (claim?.id && pendingClaimSyncIds.has(claim.id)) merged.set(claim.id, claim)
+  });
+  return Array.from(merged.values()).sort(sortClaimsNewestFirst)
+}
+
+function rerenderActiveClaimViews() {
+  if (!currentUser) return;
+  renderDashboard();
+  if (el('approval')?.classList.contains('active')) renderApproval();
+  if (el('finance')?.classList.contains('active')) renderFinance();
+  if (el('report')?.classList.contains('active')) renderReport();
+  if (el('payment')?.classList.contains('active')) renderPayment();
+  if (el('statusList')?.classList.contains('active') && activeStatus) renderStatusList();
+  if (el('financeStatusList')?.classList.contains('active') && financeStatus) renderFinanceStatusList();
+  if (el('reportClaims')?.classList.contains('active')) renderReportClaims();
+}
+
+async function refreshClaimsFromSupabase({
+  force = false
+} = {}) {
+  if (!currentUser || !canUseSupabase() || !navigator.onLine || claimRefreshInProgress) return false;
+  if (!force && Date.now() - lastClaimRefreshAt < CLAIM_REFRESH_INTERVAL_MS) return false;
+  claimRefreshInProgress = true;
+  try {
+    ensureSupabaseClient();
+    if (!supabaseReady) {
+      const standbyReady = await ensureSupabaseStandby(pendingClaimSyncIds.size > 0);
+      if (!standbyReady) return false
+    }
+    const {
+      data: remoteClaims,
+      error
+    } = await selectSupabaseClaimRows(columns => supabaseClient.from(SUPABASE_CLAIMS_TABLE).select(columns).order('created_at', {
+      ascending: false
+    }));
+    if (error) throw error;
+    claims = mergeClaimsWithRemote(remoteClaims);
+    ensureClaimOwnership();
+    save();
+    lastClaimRefreshAt = Date.now();
+    rerenderActiveClaimViews();
+    return true
+  } catch (error) {
+    console.error('Refresh klaim dari Supabase gagal:', error);
+    if (!isSupabaseMissingColumnError(error)) {
+      supabaseReady = false;
+      scheduleSupabaseReconnect();
+      updateSupabaseConnectionIndicator()
+    }
+    return false
+  } finally {
+    claimRefreshInProgress = false
+  }
+}
 window.addEventListener('online', () => {
   if (pendingClaimSyncIds.size) schedulePendingClaimSyncRetry(500);
   if (pendingAuditLogs.length) schedulePendingAuditSyncRetry(500);
   scheduleSupabaseReconnect(500);
+  refreshClaimsFromSupabase({
+    force: true
+  });
   updateSupabaseConnectionIndicator()
 });
 window.addEventListener('offline', updateSupabaseConnectionIndicator);
+window.addEventListener('focus', () => {
+  refreshClaimsFromSupabase()
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshClaimsFromSupabase({
+    force: true
+  })
+});
 ['addUnit', 'editUnit', 'deleteUnitBusiness', 'addUser', 'editUser', 'deleteUser', 'createFirstAdmin'].forEach(wrapMutationWithSupabaseSync);
 
 function hasRole(...roles) {
@@ -4077,6 +4173,7 @@ go = function(id) {
   }
   const result = baseGo(id);
   updateProtectedNav();
+  if (['home', 'approval', 'finance', 'statusList', 'financeStatusList', 'payment', 'report', 'reportClaims', 'detail'].includes(id)) refreshClaimsFromSupabase();
   return result
 };
 const scopedRenderFns = ['renderDashboard', 'renderStatusList', 'renderApproval', 'renderFinance', 'renderFinanceStatusList', 'renderPayment', 'updatePaymentTotal', 'filteredReport', 'renderReport', 'renderReportClaims'];
