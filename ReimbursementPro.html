@@ -544,7 +544,7 @@ function updateAuthEmptyState() {
     showLoginSupabaseCard = shouldShowLoginSupabaseCard();
   if (el('setupAdminCard')) el('setupAdminCard').style.display = !isAppInitializing && empty ? 'block' : 'none';
   if (el('loginSupabaseCard')) el('loginSupabaseCard').style.display = showLoginSupabaseCard ? 'block' : 'none';
-  if (el('loginHelperText')) el('loginHelperText').textContent = isAppInitializing ? 'Sedang memuat data akun...' : empty ? showLoginSupabaseCard ? 'Belum ada akun lokal. Jika akun tersimpan di server, isi config Supabase di bawah lalu muat akun.' : 'Belum ada akun. Buat admin pertama untuk mulai menggunakan aplikasi.' : showLoginSupabaseCard ? 'Jika ini device baru, isi config Supabase di bawah untuk memuat akun server sebelum login.' : 'Masuk hanya dengan email dan password akun Anda.';
+  if (el('loginHelperText')) el('loginHelperText').textContent = isAppInitializing ? 'Sedang memuat data akun...' : empty ? showLoginSupabaseCard ? 'Belum ada akun lokal. Jika akun tersimpan di server, isi config Supabase di bawah lalu muat akun.' : canUseSupabaseAuth() ? 'Belum ada akun lokal di perangkat ini. Jika akun Anda sudah ada di Supabase Auth, langsung login dengan email dan password. Profil akan dimuat otomatis.' : 'Belum ada akun. Buat admin pertama untuk mulai menggunakan aplikasi.' : showLoginSupabaseCard ? 'Jika ini device baru, isi config Supabase di bawah untuk memuat akun server sebelum login.' : 'Masuk hanya dengan email dan password akun Anda.';
   if (!empty && el('setupAdminPassword'))['setupAdminName', 'setupAdminEmail', 'setupAdminPassword'].forEach(id => {
     if (el(id)) el(id).value = ''
   })
@@ -1036,7 +1036,7 @@ async function syncUserFromSupabaseAuth(authUser, allowProfileCreation = false) 
     authUserId: authUser.id || '',
     email: authUser.email || ''
   });
-  if (!profile && (allowProfileCreation || localUser)) {
+  if (!profile && (allowProfileCreation || localUser || authUser?.email)) {
     const draftProfile = buildUserFromAuth(authUser, localUser || {});
     await upsertSupabaseUserProfile(draftProfile);
     profile = await fetchSupabaseUserProfile({
