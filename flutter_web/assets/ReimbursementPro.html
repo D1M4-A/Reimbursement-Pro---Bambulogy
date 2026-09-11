@@ -2167,7 +2167,7 @@ function renderFinanceStatusList() {
   el('financeStatusUnit').textContent = unit || 'Semua Unit';
   el('financeStatusCount').textContent = rows.length + ' pengajuan';
   el('financeStatusTotal').textContent = rupiah(sumRows(rows));
-  el('financeStatusContent').innerHTML = rows.length ? rows.map(c => `<div class="item status-item" onclick="openFinanceDetail('${c.id}')"><div class="avatar">${(c.employee||'K').split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div class="item-main"><b>${c.employee||'Karyawan'}</b><small>${c.unit}<br>${c.category} • ${c.vendor}</small><div class="badge ${statusClass(c.status)}">${title}</div></div><div class="amount">${rupiah(c.amount)}<div class="helper">Lihat detail ›</div></div></div>`).join('') : '<div class="empty">Tidak ada pengajuan pada kategori ini.</div>'
+  el('financeStatusContent').innerHTML = rows.length ? rows.map(c => `<div class="item status-item" onclick="openFinanceDetail('${c.id}')"><div class="avatar">${(c.employee||'K').split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div class="item-main"><b>${c.employee||'Karyawan'}</b><small>${c.unit}<br>${c.category} • ${c.vendor}</small><div class="badge ${statusClass(c.status)}">${title}</div></div><div class="amount">${rupiah(c.amount)}${financeStatus==='Diproses Finance'?`<button class="secondary queue-btn" onclick="event.stopPropagation();verifyClaim('${c.id}')">Verifikasi</button>`:'<div class="helper">Lihat detail ›</div>'}</div></div>`).join('') : '<div class="empty">Tidak ada pengajuan pada kategori ini.</div>'
 }
 
 function openFinanceDetail(id) {
