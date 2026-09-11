@@ -291,7 +291,8 @@ h1,h2,h3{color:#0c1830}
   bottom:auto;
   height:74px;
   min-height:74px;
-  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));
+  align-items:center;
   border:1px solid rgba(177,196,222,.55);
   border-radius:24px;
   background:rgba(255,255,255,.78);
@@ -301,6 +302,14 @@ h1,h2,h3{color:#0c1830}
 }
 .nav{
   min-width:72px;
+  min-height:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  line-height:1.1;
   border-radius:18px;
   padding:8px 10px;
 }
